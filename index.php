@@ -13,62 +13,87 @@
 
 </head>
 
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">VIVTech Support</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="dashboard.php">Dashboard <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php">Form</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<body style="background-color: #E2DFD2;">
+    <?php include 'navbar .html'; ?>
     <div class="container pt-4">
-        <a class="w-100 btn btn-primary" href="dashboard.php"><span class="me-2"><i
-                    class="fa-solid fa-border-all"></i></span>Dashboard</a>
-        <form action="action/jobsheet-submit.php" method="post">
-            <h3 class="text-center py-4">Jobsheet</h3>
-            <div class="form-group">
-                <label for="date">Date</label>
-                <input type="date" class="form-control" id="date" name="date">
-            </div>
-            <div class="form-group">
-                <label for="time">Time</label>
-                <input type="time" class="form-control" id="time" name="time">
-            </div>
-            <div class="form-group">
-                <label for="hotelname">Hotel Name</label>
-                <input type="text" class="form-control" id="hotelname" name="hotelname">
-            </div>
-            <div class="form-group">
-                <label for="complaint">Complaint</label>
-                <textarea type="text" class="form-control" id="complaint" name="complaint"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="fault">Description of Fault</label>
-                <textarea type="text" class="form-control" id="fault" name="fault"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="repair">Description of repair</label>
-                <textarea type="text" class="form-control" id="repair" name="repair"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="partreplaced">Item replaced</label>
-                <textarea type="text" class="form-control" id="partreplaced" name="partreplaced"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Submit</button>
-        </form>
+        <div class="p-4 bg-white rounded">
+            <form action="action/jobsheet-submit.php" method="post">
+                <h3 class="text-center py-4">Jobsheet</h3>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" class="form-control" id="date" name="date">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="time">Time</label>
+                            <input type="time" class="form-control" id="time" name="time">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        
+                    </div>
+                    <div class="col"></div>
+                </div>
+                <div class="form-group">
+                    <label for="hotelname">Hotel Name</label>
+                    <select class="form-control" id="hotelname" name="hotelname">
+                        <option value="" disabled selected>Select a hotel</option>
+                        <?php
+                        include 'db.php';
+                        $stmt = $conn->prepare("SELECT * FROM hotel");
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="complaint">Complaint</label>
+                    <textarea type="text" class="form-control" id="complaint" name="complaint"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="fault">Description of Fault</label>
+                    <textarea type="text" class="form-control" id="fault" name="fault"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="repair">Description of repair</label>
+                    <textarea type="text" class="form-control" id="repair" name="repair"></textarea>
+                </div>
+                <div class="form-group d-none">
+                    <label for="partreplaced">Items Replaced</label>
+                    <div id="item-container">
+                        <div class="form-inline mb-2 item-row">
+                            <select class="form-control mr-3" name="item[]">
+                                <option value="" disabled selected>Select an item</option>
+                                <?php
+                                $stmt = $conn->prepare("SELECT * FROM items");
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                while ($row = $result->fetch_assoc()) {
+                                    echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                                }
+                                ?>
+                            </select>
+                            <select class="form-control mr-3" name="quantity[]">
+                                <?php
+                                for ($i = 1; $i <= 15; $i++) {
+                                    echo "<option value='$i'>$i</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
+            </form>
+        </div>
     </div>
 </body>
 
