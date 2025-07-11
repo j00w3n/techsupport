@@ -1,7 +1,8 @@
 <?php
 include 'db.php';
 $hotelResult = $conn->query("SELECT * FROM hotel");
-$itemResult = $conn->query(query: "SELECT * FROM items");
+$itemResult = $conn->query("SELECT items.name, inventory.stock_quantity FROM inventory JOIN items ON inventory.item_id = items.id
+");
 
 ?>
 <!DOCTYPE html>
@@ -36,19 +37,25 @@ $itemResult = $conn->query(query: "SELECT * FROM items");
                             <label for="itemName">Item Name</label>
                             <input type="text" class="form-control" id="itemName" name="itemName" required>
                         </div>
+                        <div class="form-group">
+                            <label for="itemQuantity">Initial Stock Quantity</label>
+                            <input type="number" class="form-control" id="itemQuantity" name="itemQuantity" min="0"
+                                required>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus pe-3"></i><span
-                                class="ps-2">Add</span></button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-plus pe-3"></i><span class="ps-2">Add</span>
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     <div class="container pt-4">
-    <div class="row mb-4">
+        <div class="row mb-4">
             <div class="col-lg-12">
-                <h4>Item List</h4>
+                <h4>Inventory</h4>
                 <div class="row">
                     <div class="col-lg-12 d-flex justify-content-end">
                         <div class="mb-3">
@@ -64,13 +71,16 @@ $itemResult = $conn->query(query: "SELECT * FROM items");
                         <tr>
                             <th>No</th>
                             <th>Name</th>
+                            <th>Quantity</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $i = 1; while ($row = $itemResult->fetch_assoc()): ?>
+                        <?php $i = 1;
+                        while ($row = $itemResult->fetch_assoc()): ?>
                             <tr>
                                 <td style="width: 5%; white-space: nowrap;"><?= $i++ ?></td>
                                 <td style="width: 95%; white-space: nowrap;"><?= $row['name'] ?></td>
+                                <td style="width: 95%; white-space: nowrap;"><?= $row['stock_quantity'] ?></td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>

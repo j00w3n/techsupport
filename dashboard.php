@@ -1,22 +1,26 @@
 <?php
 include 'db.php';
 $hotelperson = $conn->query("SELECT h.name AS hotel_name, p.picname AS person_name FROM hotel h JOIN hotel_person p ON h.id = p.hotel_id ORDER BY h.name, p.picname;");
-$jobsheetResult = $conn->query("SELECT 
-j.id,
-j.date,
-j.time,
-h.name AS hotel_name,
-j.complaint,
-j.fault,
-j.repair
-FROM 
-jobsheet j
-JOIN 
-hotel h ON j.hotel_id = h.id
- 
-ORDER BY 
-j.date DESC;
+$jobsheetResult = $conn->query("
+  SELECT 
+    j.id,
+    j.date,
+    j.time,
+    h.name AS hotel_name,
+    j.complaint,
+    j.fault,
+    j.repair,
+    p.picname AS person_name
+  FROM 
+    jobsheet j
+  JOIN 
+    hotel h ON j.hotel_id = h.id
+  LEFT JOIN 
+    hotel_person p ON j.person_id = p.picid
+  ORDER BY 
+    j.date DESC
 ");
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -101,7 +105,7 @@ j.date DESC;
         <div class="row">
             <div class="col-lg-12">
                 <h4 class="py-2">Jobsheet List</h4>
-                <table id="jobsheetTable" class="table table-bordered table-striped mb-5">
+                <table id="jobsheetTable" class="table table-responsive table-bordered table-striped mb-5">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -119,9 +123,9 @@ j.date DESC;
                                 <td><?php echo $row["date"]; ?></td>
                                 <td><?php echo $row["time"]; ?></td>
                                 <td><?php echo $row["hotel_name"]; ?></td>
+                                <td><?php echo $row["person_name"]; ?></td>
+                                <td><?php echo $row["complaint"]; ?></td>
                                 <td><?php echo $row["fault"]; ?></td>
-                                <td><?php echo $row["repair"]; ?></td>
-                                <td><?php echo $row["repair"]; ?></td>
                                 <td><?php echo $row["repair"]; ?></td>
                             </tr>
                         <?php endwhile; ?>
