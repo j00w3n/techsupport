@@ -1,7 +1,7 @@
 <?php
 include 'db.php';
 $hotelResult = $conn->query("SELECT * FROM hotel");
-$itemResult = $conn->query("SELECT items.name, inventory.stock_quantity FROM inventory JOIN items ON inventory.item_id = items.id
+$itemResult = $conn->query("SELECT items.id, items.name, inventory.stock_quantity FROM inventory JOIN items ON inventory.item_id = items.id
 ");
 
 ?>
@@ -21,12 +21,12 @@ $itemResult = $conn->query("SELECT items.name, inventory.stock_quantity FROM inv
 </head>
 
 <body>
-    <?php include 'navbar .html'; ?>
+    <?php include 'navbar.html'; ?>
     <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addHotelModalLabel">Add Hotel</h5>
+                    <h5 class="modal-title" id="addHotelModalLabel">Add Item</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -45,13 +45,45 @@ $itemResult = $conn->query("SELECT items.name, inventory.stock_quantity FROM inv
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fa-solid fa-plus pe-3"></i><span class="ps-2">Add</span>
+                            Add<i class="fa-solid fa-plus pl-2"></i>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    <!-- Edit Item Modal -->
+    <div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <form id="editItemForm" method="post" action="edit-item.php">
+                <div class="modal-header">
+                <h5 class="modal-title" id="editItemModalLabel">Edit Item</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                <input type="hidden" id="editItemId" name="item_id">
+
+                <div class="form-group">
+                    <label for="editItemName">Item Name</label>
+                    <input type="text" class="form-control" id="editItemName" name="item_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editItemQuantity">Stock Quantity</label>
+                    <input type="number" class="form-control" id="editItemQuantity" name="stock_quantity" min="0" required>
+                </div>
+                </div>
+                <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+
     <div class="container pt-4">
         <div class="row mb-4">
             <div class="col-lg-12">
@@ -61,7 +93,7 @@ $itemResult = $conn->query("SELECT items.name, inventory.stock_quantity FROM inv
                         <div class="mb-3">
                             <button type="button" class="btn btn-sm btn-primary" data-toggle="modal"
                                 data-target="#addItemModal">
-                                Add Item
+                                <i class="fa-solid fa-circle-plus pr-2"></i>Add Item
                             </button>
                         </div>
                     </div>
@@ -72,6 +104,7 @@ $itemResult = $conn->query("SELECT items.name, inventory.stock_quantity FROM inv
                             <th>No</th>
                             <th>Name</th>
                             <th>Quantity</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,6 +114,12 @@ $itemResult = $conn->query("SELECT items.name, inventory.stock_quantity FROM inv
                                 <td style="width: 5%; white-space: nowrap;"><?= $i++ ?></td>
                                 <td style="width: 95%; white-space: nowrap;"><?= $row['name'] ?></td>
                                 <td style="width: 95%; white-space: nowrap;"><?= $row['stock_quantity'] ?></td>
+                                <td style="width: 5%; white-space: nowrap;">
+                                    <button class="btn btn-sm btn-warning edit-item-btn" data-toggle="modal"
+                                        data-target="#editItemModal" data-id="<?= $row['id'] ?>"
+                                        data-name="<?= $row['name'] ?>" data-quantity="<?= $row['stock_quantity'] ?>">
+                                        <i class="fa-solid fa-edit"></i>
+                                    </button>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -88,6 +127,27 @@ $itemResult = $conn->query("SELECT items.name, inventory.stock_quantity FROM inv
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function () {
+            // Handle edit item button click
+            $('.edit-item-btn').on('click', function () {
+                const itemId = $(this).data('id');
+                const itemName = $(this).data('name');
+                const itemQuantity = $(this).data('quantity');
+
+                $('#editItemId').val(itemId);
+                $('#editItemName').val(itemName);
+                $('#editItemQuantity').val(itemQuantity);
+            });
+            const url = new URL(window.location.href);
+            const updated = url.searchParams.get('updated');
+            if (updated) {
+                alert("Item updated successfully!");
+                url.searchParams.delete('updated');
+                window.history.replaceState({}, document.title, url.pathname + url.search);
+            }
+        });
+    </script>
 </body>
 
 </html>

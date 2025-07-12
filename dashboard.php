@@ -2,23 +2,60 @@
 include 'db.php';
 $hotelperson = $conn->query("SELECT h.name AS hotel_name, p.picname AS person_name FROM hotel h JOIN hotel_person p ON h.id = p.hotel_id ORDER BY h.name, p.picname;");
 $jobsheetResult = $conn->query("
-  SELECT 
+SELECT 
     j.id,
     j.date,
     j.time,
     h.name AS hotel_name,
+    p.picname AS person_name,
+    j.task_type,
     j.complaint,
     j.fault,
     j.repair,
-    p.picname AS person_name
-  FROM 
+    GROUP_CONCAT(CONCAT(i.name, ' (x', ji.quantity, ')') SEPARATOR ', ') AS items_used
+FROM 
     jobsheet j
-  JOIN 
+JOIN 
     hotel h ON j.hotel_id = h.id
-  LEFT JOIN 
+LEFT JOIN 
     hotel_person p ON j.person_id = p.picid
-  ORDER BY 
-    j.date DESC
+LEFT JOIN 
+    jobsheet_items ji ON j.id = ji.jobsheet_id
+LEFT JOIN 
+    items i ON ji.item_id = i.id
+GROUP BY 
+    j.id
+ORDER BY 
+    j.date DESC;
+
+");
+$jobsheetResult1 = $conn->query("
+SELECT 
+    j.id,
+    j.date,
+    j.time,
+    h.name AS hotel_name,
+    p.picname AS person_name,
+    j.task_type,
+    j.complaint,
+    j.fault,
+    j.repair,
+    GROUP_CONCAT(CONCAT(i.name, ' (x', ji.quantity, ')') SEPARATOR ', ') AS items_used
+FROM 
+    jobsheet j
+JOIN 
+    hotel h ON j.hotel_id = h.id
+LEFT JOIN 
+    hotel_person p ON j.person_id = p.picid
+LEFT JOIN 
+    jobsheet_items ji ON j.id = ji.jobsheet_id
+LEFT JOIN 
+    items i ON ji.item_id = i.id
+GROUP BY 
+    j.id
+ORDER BY 
+    j.date DESC;
+
 ");
 
 ?>
@@ -30,7 +67,7 @@ $jobsheetResult = $conn->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIVTech Support</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
@@ -39,7 +76,7 @@ $jobsheetResult = $conn->query("
 </head>
 
 <body>
-    <?php include 'navbar .html'; ?>
+    <?php include 'navbar.html'; ?>
 
     <!-- Modal -->
     <div class="modal fade" id="addHotelModal" tabindex="-1" aria-labelledby="addHotelModalLabel" aria-hidden="true">
@@ -88,7 +125,26 @@ $jobsheetResult = $conn->query("
             </div>
         </div>
     </div>
-
+    <!-- modal for jobsheet details -->
+    <div class="modal fade" id="jobsheetDetailsModal" tabindex="-1" aria-labelledby="jobsheetDetailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="jobsheetDetailsModalLabel">Jobsheet Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="jobsheetDetailsBody">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <div class="row mt-3">
             <div class="col-lg-12">
@@ -115,6 +171,8 @@ $jobsheetResult = $conn->query("
                             <th>Complaint</th>
                             <th>Fault</th>
                             <th>Repair</th>
+                            <th>Items Used</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,6 +185,12 @@ $jobsheetResult = $conn->query("
                                 <td><?php echo $row["complaint"]; ?></td>
                                 <td><?php echo $row["fault"]; ?></td>
                                 <td><?php echo $row["repair"]; ?></td>
+                                <td><?php echo $row["items_used"]; ?></td>
+                                <td>
+                                    <button class="btn btn-sm btn-info view-details-btn" data-toggle="modal"
+                                        data-target="#jobsheetDetailsModal" data-id="<?php echo $row['id']; ?>">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -156,18 +220,21 @@ $jobsheetResult = $conn->query("
         </div>
     </div>
     <script>
-        // $(document).ready(function () {
-        //     var table = $("#jobsheetTable").DataTable(
-        //         {
-        //             columnDefs: [
-        //                 {
-        //                     targets: [0, 1, 2, 3, 4],
-        //                     className: "dt-center"
-        //                 }
-        //             ]
-        //         }
-        //     );
-        // });
+$(document).ready(function () {
+    $('.view-details-btn').on('click', function () {
+        const jobsheetId = $(this).data('id');
+
+        $.ajax({
+            url: 'get-jobsheet-details.php',
+            type: 'POST',
+            data: { id: jobsheetId },
+            success: function (response) {
+                $('#jobsheetDetailsBody').html(response);
+                $('#viewJobsheetModal').modal('show'); // Show the modal
+            }
+        });
+    });
+});
     </script>
 </body>
 

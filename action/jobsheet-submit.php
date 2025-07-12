@@ -12,9 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fault = $_POST['fault'];
     $repair = $_POST['repair'];
     $picemail = $_POST['picemail'];
-    $maint_note = $_POST['maintenance_note'];
-    $install_note = $_POST['installation_note'];
-    $dismantle_note = $_POST['dismantle_note'];
+    $maint_note = $_POST['maintenance_note']?? ''; // Default to empty string if not set
+    $install_note = $_POST['installation_note'] ?? ''; // Default to empty string if not set
+    $dismantle_note = $_POST['dismantle_note'] ?? '';
     $new_staff_name = $_POST['newstaff'];
 
     // ✅ Step 1.1: Check if the selected person's email needs update
@@ -51,19 +51,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $items = $_POST['item'];        // [item_id1, item_id2, ...]
     $quantities = $_POST['quantity']; // [qty1, qty2, ...]
 
+    
     // Step 3: Insert into jobsheet
-    $stmt = $conn->prepare("INSERT INTO jobsheet (date, time, name,task, person_id, complaint, fault, repair)
-                            VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssiisss", $date, $time, $hotel_id,$typetask, $person_id, $complaint, $fault, $repair);
-
+    $stmt = $conn->prepare("INSERT INTO jobsheet 
+        (date, time, hotel_id, task_type, person_id, complaint, fault, repair, troubleshoot_note, install_note, dismantle_note) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssisssssss", $date, $time, $hotel_id, $typetask, $person_id, $complaint, $fault, $repair, $maint_note, $install_note, $dismantle_note);
     if ($stmt->execute()) {
         $jobsheet_id = $stmt->insert_id;
         $stmt->close();
 
         // Step 4: Insert item rows and update inventory
         $itemStmt = $conn->prepare("INSERT INTO jobsheet_items (jobsheet_id, item_id, quantity) VALUES (?, ?, ?)");
-        $stockStmt = $conn->prepare("UPDATE inventory SET stock_quantity = stock_quantity - ? WHERE item_id = ?");
-
+        if($typetask === 'Installation') {
+            $stockStmt = $conn->prepare("UPDATE inventory SET stock_quantity = stock_quantity - ? WHERE item_id = ?");
+        } else {
+            $stockStmt = $conn->prepare("UPDATE inventory SET stock_quantity = stock_quantity + ? WHERE item_id = ?");
+        }
         foreach ($items as $index => $item_id) {
             $qty = intval($quantities[$index]);
             if (!empty($item_id) && $qty > 0) {
@@ -76,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stockStmt->execute();
             }
         }
-
         $itemStmt->close();
         $stockStmt->close();
         $conn->close();

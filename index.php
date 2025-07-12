@@ -16,7 +16,7 @@
 </head>
 
 <body style="background-color: #E2DFD2;">
-    <?php include 'navbar .html'; ?>
+    <?php include 'navbar.html'; ?>
     <div class="container pt-4">
         <div class="p-4 bg-white rounded">
             <form action="action/jobsheet-submit.php" method="post">
@@ -99,8 +99,8 @@
                 <!-- Installation Fields -->
                 <div id="section-installation" class="task-section d-none">
                     <div class="form-group">
-                        <label for="install_note">Installation Note</label>
-                        <textarea class="form-control" name="install_note"></textarea>
+                        <label for="installation_note">Installation Note</label>
+                        <textarea class="form-control" name="installation_note"></textarea>
                     </div>
                 </div>
 

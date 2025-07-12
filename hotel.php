@@ -18,7 +18,7 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
 </head>
 
 <body>
-    <?php include 'navbar .html'; ?>
+    <?php include 'navbar.html'; ?>
     <div class="container pt-4">
         <div class="row mb-4">
             <div class="col-lg-12">

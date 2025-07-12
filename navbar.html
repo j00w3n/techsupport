@@ -1,3 +1,20 @@
+<style>
+.navbar {
+    background-color: #007bff; /* Primary color */
+}
+.navbar-brand {
+    color: #fff; /* White text for brand */
+}
+.navbar-nav .nav-link {
+    color: #fff; /* White text for links */
+}
+.navbar-nav .nav-link:hover {
+    color: #f8f9fa; /* Lighter shade on hover */
+}
+.navbar-nav .nav-item.active .nav-link {
+    color: #ffc107 !important; /* Highlight active link */
+}
+</style>
 <nav class="navbar navbar-expand-lg navbar-light bg-primary">
     <div class="container">
         <a class="navbar-brand fw-bold text-white" href="#">VIVTech Support</a>
@@ -11,7 +28,7 @@
                 <li class="nav-item">
                     <a class="nav-link text-white" href="index.php">Form</a>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item">
                     <a class="nav-link text-white" href="dashboard.php">Dashboard <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
@@ -24,3 +41,18 @@
         </div>
     </div>
 </nav>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+        var currentPath = window.location.pathname.replace('/techsupport/', '').replace('.php', '').toLowerCase();
+        var navLinks = document.querySelectorAll(".navbar-nav .nav-link");
+        navLinks.forEach(function (link) {
+            var linkPath = link.getAttribute("href").replace('.php', '').toLowerCase();
+            var parentLi = link.closest('.nav-item');
+            if (linkPath === currentPath) {
+                if (parentLi) parentLi.classList.add("active");
+            } else {
+                if (parentLi) parentLi.classList.remove("active");
+            }
+        });
+    });
+</script>
