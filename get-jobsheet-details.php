@@ -39,17 +39,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 
     while ($row = $result->fetch_assoc()) {
         echo "
-        <div class='info'><span class=''>info: </span>".$row['hotel_name']."</div>
-        <div class='info'><span class=''>info: </span>".$row['date']." ".$row['time']."</div>
-        <div class='info'><span class=''>info: </span>".$row['task_type']."</div>
-        <div class='info'><span class=''>info: </span>".$row['person_name']."</div>
-        <div class='info'><span class=''>info: </span>".$row['complaint']."</div>
-        <div class='info'><span class=''>info: </span>".$row['fault']."</div>
-        <div class='info'><span class=''>info: </span>".$row['repair']."</div>
-        <div class='info'><span class=''>info: </span>".$row['items_used']."</div>
+        <div class='info'><span class=''>Hotel Name: </span>".$row['hotel_name']."</div>
+        <div class='info'><span class=''>Date: </span>".$row['date']." ".$row['time']."</div>
+        <div class='info'><span class=''>Task: </span>".$row['task_type']."</div>
+        <div class='info'><span class=''>Person: </span>".$row['person_name']."</div>
+        <div class='info'><span class=''>Complaint: </span>".$row['complaint']."</div>
+        <div class='info'><span class=''>Fault: </span>".$row['fault']."</div>
+        <div class='info'><span class=''>Repair: </span>".$row['repair']."</div>
+        <div class='info'><span class=''>Items Used: </span>".$row['items_used']."</div>
         ";
     }
-
     $stmt->close();
     $conn->close();
 }
