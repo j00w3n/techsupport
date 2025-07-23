@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 11, 2025 at 11:29 AM
+-- Generation Time: Jul 23, 2025 at 11:25 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -38,10 +38,12 @@ CREATE TABLE `hotel` (
 --
 
 INSERT INTO `hotel` (`id`, `name`, `state`) VALUES
-(1, 'Mercure Living', 'Selangor'),
+(1, 'Mercure Living', 'Kelantan'),
 (2, 'Imperial Regency', 'Kuala Lumpur'),
 (3, 'Wyndham Grand Bangsar', 'Kuala Lumpur'),
-(16, 'Aloft', 'Kuala Lumpur');
+(16, 'Aloft', 'Kuala Lumpur'),
+(17, 'test', 'Negeri Sembilan'),
+(18, 'test', 'Negeri Sembilan');
 
 -- --------------------------------------------------------
 
@@ -216,7 +218,7 @@ ALTER TABLE `jobsheet_items`
 -- AUTO_INCREMENT for table `hotel`
 --
 ALTER TABLE `hotel`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `hotel_person`
