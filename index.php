@@ -19,7 +19,7 @@
     <?php include 'navbar.html'; ?>
     <div class="container pt-4">
         <div class="p-4 bg-white rounded">
-            <form action="action/jobsheet-submit.php" method="post">
+            <form action="jobsheet/jobsheet-submit.php" method="post">
                 <h3 class="text-center py-4">Jobsheet</h3>
                 <div class="row">
                     <div class="col">

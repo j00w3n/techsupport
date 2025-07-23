@@ -68,14 +68,25 @@ ORDER BY
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIVTech Support</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script> <!-- script type="text/javascript" src="js/date_time.js"></script -->
+    <!-- script type="text/javascript" src="engine1/jquery.js"></script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
+        integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <link rel="stylesheet" href="style.css">
     <style>
+        body {
+            overflow-x: hidden;
+        }
+
         table thead tr th {
             text-align: center;
             white-space: nowrap;
@@ -107,55 +118,6 @@ ORDER BY
 
 <body>
     <?php include 'navbar.html'; ?>
-
-    <!-- Modal add hotel -->
-    <div class="modal fade" id="addHotelModal" tabindex="-1" aria-labelledby="addHotelModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addHotelModalLabel">Add Hotel</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="add-hotel.php" method="post">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="hotelName">Hotel Name</label>
-                            <input type="text" class="form-control" id="hotelName" name="hotelName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="hotelState">State</label>
-                            <select class="form-control" id="hotelState" name="hotelState" required>
-                                <option value="" disabled selected>Select a state</option>
-                                <option value="Johor">Johor</option>
-                                <option value="Kedah">Kedah</option>
-                                <option value="Kelantan">Kelantan</option>
-                                <option value="Malacca">Malacca</option>
-                                <option value="Negeri Sembilan">Negeri Sembilan</option>
-                                <option value="Pahang">Pahang</option>
-                                <option value="Penang">Penang</option>
-                                <option value="Perak">Perak</option>
-                                <option value="Perlis">Perlis</option>
-                                <option value="Sabah">Sabah</option>
-                                <option value="Sarawak">Sarawak</option>
-                                <option value="Selangor">Selangor</option>
-                                <option value="Terengganu">Terengganu</option>
-                                <option value="Kuala Lumpur">Kuala Lumpur</option>
-                                <option value="Labuan">Labuan</option>
-                                <option value="Putrajaya">Putrajaya</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus pe-3"></i><span
-                                class="ps-2">Add</span></button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- modal for jobsheet details -->
     <div class="modal fade" id="jobsheetDetailsModal" tabindex="-1" aria-labelledby="jobsheetDetailsModalLabel"
         aria-hidden="true">
@@ -179,13 +141,21 @@ ORDER BY
     <div class="container">
         <div class="row mt-3">
             <div class="col-lg-12">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                    </ol>
-                </nav>
-                <a href="index.php" class="btn btn-sm btn-primary">form</a>
+                <div class="d-flex justify-content-between">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a class="text-decoration-none text-dark"
+                                    href="index.php">Home</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                        </ol>
+                    </nav>
+                    <div>
+                        <a href="index.php" class="btn btn-sm btn-primary px-3"><i
+                                class="fa-solid fa-pen pe-2"></i>Jobsheet
+                            Form</a>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -330,9 +300,10 @@ ORDER BY
                                             </button>
                                             <a href="mailto:<?= $row['person_email'] ?>?subject=Support%20Job%20Update&body=Dear%20<?= urlencode($row['person_name']) ?>,"
                                                 class="btn btn-sm btn-info">
-                                                    <i class="fa-solid fa-envelope"></i>
-                                                </a>
-                                                <a href="generatepdf.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-success" target="_blank">
+                                                <i class="fa-solid fa-envelope"></i>
+                                            </a>
+                                            <a href="generatepdf.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-success"
+                                                target="_blank">
                                                 <i class="fa-solid fa-file-pdf"></i>
                                             </a>
 

@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hotelName = trim($_POST['hotelName']);
@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ss", $hotelName, $hotelState);
 
         if ($stmt->execute()) {
-            header("Location: dashboard.php");
+            header("Location: ../hotel.php?added=1");
             exit();
         } else {
             echo "Error: " . $stmt1->error;

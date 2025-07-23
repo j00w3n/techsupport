@@ -1,3 +1,16 @@
-.form-group label{
+.form-group label {
     font-weight: 500 !important;
+}
+
+table td,
+table th {
+    font-size: 14px !important;
+}
+
+.breadcrumb {
+    font-size: 14px;
+}
+
+html {
+    width: 100vw;
 }

@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $invStmt->execute();
             $invStmt->close();
 
-            header("Location: item-catalog.php?success=1");
+            header("Location: item-catalog.php?added=1");
             exit();
         } else {
             echo "❌ Failed to add item: " . $stmt->error;
