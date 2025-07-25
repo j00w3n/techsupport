@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 23, 2025 at 11:25 AM
+-- Generation Time: Jul 25, 2025 at 11:02 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -117,29 +117,39 @@ CREATE TABLE `jobsheet` (
   `id` int(11) NOT NULL,
   `date` date DEFAULT NULL,
   `time` time DEFAULT NULL,
-  `complaint` text DEFAULT NULL,
-  `fault` text DEFAULT NULL,
-  `repair` text DEFAULT NULL,
+  `description` text DEFAULT NULL,
   `hotel_id` int(11) DEFAULT NULL,
   `person_id` int(11) DEFAULT NULL,
-  `task_type` enum('troubleshoot','installation','dismantle') NOT NULL DEFAULT 'troubleshoot',
-  `troubleshoot_note` text DEFAULT NULL,
-  `install_note` text DEFAULT NULL,
-  `dismantle_note` text DEFAULT NULL
+  `task_type` varchar(45) NOT NULL DEFAULT 'troubleshoot'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `jobsheet`
 --
 
-INSERT INTO `jobsheet` (`id`, `date`, `time`, `complaint`, `fault`, `repair`, `hotel_id`, `person_id`, `task_type`, `troubleshoot_note`, `install_note`, `dismantle_note`) VALUES
-(1, '2025-07-08', '14:19:00', 'news not running', 'modulator hang', 'reboot the modulator', 1, NULL, 'troubleshoot', NULL, NULL, NULL),
-(4, '2025-07-11', '14:33:00', '-', '-', '-', 2, 1, 'troubleshoot', NULL, NULL, NULL),
-(5, '2025-07-17', '17:06:00', '-', '-', '-', 2, 1, 'troubleshoot', NULL, NULL, NULL),
-(6, '2025-07-12', '14:31:00', '', '', '', 2, 1, 'troubleshoot', NULL, NULL, NULL),
-(7, '2025-07-19', '17:09:00', '-', '-', '-', 1, NULL, 'troubleshoot', NULL, NULL, NULL),
-(8, '0000-00-00', '00:00:00', '', '-', '-', 2, 1, 'troubleshoot', NULL, NULL, NULL),
-(9, '0000-00-00', '00:00:00', '-', '-', '-', 2, 2, 'troubleshoot', NULL, NULL, NULL);
+INSERT INTO `jobsheet` (`id`, `date`, `time`, `description`, `hotel_id`, `person_id`, `task_type`) VALUES
+(1, '2025-07-08', '14:19:00', 'news not running', 1, NULL, 'troubleshoot'),
+(13, '2025-07-25', '11:58:00', '-', 16, NULL, 'installation'),
+(34, '2025-01-10', '09:00:00', 'WiFi not working', 1, 1, 'troubleshoot'),
+(35, '2025-01-15', '11:15:00', 'TV signal loss', 2, 2, 'troubleshoot'),
+(36, '2025-02-01', '14:30:00', 'New IPTV installed', 3, 1, 'installation'),
+(37, '2025-02-12', '10:00:00', 'Dismantle old router', 16, 2, 'dismantle'),
+(38, '2025-03-03', '13:45:00', 'No signal on Channel 5', 17, 1, 'troubleshoot'),
+(39, '2025-03-10', '16:20:00', 'Server maintenance', 18, 2, 'maintanance'),
+(40, '2025-04-05', '08:30:00', 'Install new router', 1, 1, 'installation'),
+(41, '2025-04-12', '17:00:00', 'Remove broken antenna', 2, 2, 'dismantle'),
+(42, '2025-05-01', '12:00:00', 'Remote not working', 3, 1, 'troubleshoot'),
+(43, '2025-05-09', '15:10:00', 'Update server software', 16, 2, 'maintanance'),
+(44, '2025-06-01', '09:45:00', 'Check HDMI port', 17, 1, 'troubleshoot'),
+(45, '2025-06-15', '11:30:00', 'Install Smart TV', 18, 2, 'installation'),
+(46, '2025-06-25', '14:10:00', 'Dismantle faulty TV', 1, 1, 'dismantle'),
+(47, '2025-07-01', '10:00:00', 'General checkup', 2, 2, 'maintanance'),
+(48, '2025-07-05', '13:20:00', 'Rewire power adapter', 3, 1, 'troubleshoot'),
+(49, '2025-07-10', '15:50:00', 'Replace decoder', 16, 2, 'installation'),
+(50, '2025-07-12', '16:40:00', 'Remove outdated cables', 17, 1, 'dismantle'),
+(51, '2025-07-14', '08:10:00', 'Maintenance routine', 18, 2, 'maintanance'),
+(52, '2025-07-20', '12:45:00', 'Screen is black', 1, 1, 'troubleshoot'),
+(53, '2025-07-25', '11:00:00', 'Install new setup', 2, 2, 'installation');
 
 -- --------------------------------------------------------
 
@@ -153,16 +163,6 @@ CREATE TABLE `jobsheet_items` (
   `item_id` int(11) NOT NULL,
   `quantity` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `jobsheet_items`
---
-
-INSERT INTO `jobsheet_items` (`id`, `jobsheet_id`, `item_id`, `quantity`) VALUES
-(1, 4, 2, 3),
-(2, 5, 2, 3),
-(3, 5, 3, 2),
-(4, 6, 2, 15);
 
 --
 -- Indexes for dumped tables
@@ -224,7 +224,7 @@ ALTER TABLE `hotel`
 -- AUTO_INCREMENT for table `hotel_person`
 --
 ALTER TABLE `hotel_person`
-  MODIFY `picid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `picid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `inventory`
@@ -242,7 +242,7 @@ ALTER TABLE `items`
 -- AUTO_INCREMENT for table `jobsheet`
 --
 ALTER TABLE `jobsheet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `jobsheet_items`
