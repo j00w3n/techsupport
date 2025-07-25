@@ -6,7 +6,7 @@ if (isset($_GET['id'])) {
     $jobsheet_id = $_GET['id'];
 
     // Get jobsheet details
-    $stmt = $conn->prepare("SELECT j.*, h.name AS hotel_name, p.picname AS person_name,p.email AS person_email
+    $stmt = $conn->prepare("SELECT j.*, DATE_FORMAT(j.date, '%d %M %Y') AS date, TIME_FORMAT(j.time, '%H:%i %p') AS time, h.name AS hotel_name, p.picname AS person_name,p.email AS person_email
                             FROM jobsheet j
                             JOIN hotel h ON j.hotel_id = h.id
                             LEFT JOIN hotel_person p ON j.person_id = p.picid
@@ -92,7 +92,7 @@ if (isset($_GET['id'])) {
     $pdf->SetTextColor(0, 71, 171);
     $pdf->Cell(50, 10, 'Description:', 0, 0);
     $pdf->SetTextColor(0, 0, 0);
-    $pdf->MultiCell(0, 10, $row['complaint']);
+    $pdf->MultiCell(0, 10, $row['description']);
     $pdf->SetTextColor(0, 71, 171);
     // $pdf->Cell(50, 10, 'Repair:', 0, 0);
     // $pdf->SetTextColor(0, 0, 0);

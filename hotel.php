@@ -117,15 +117,15 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
     </div>
     <?php include 'navbar.html'; ?>
     <div class="container">
-        <div class="row mt-3">
+        <div class="row my-3">
             <div class="col-lg-12">
-                <div class="d-flex justify-content-between">
-                    <nav aria-label="breadcrumb">
+                <div class="breadcrumb-container d-flex flex-row bg-white justify-content-between align-items-center">
+                    <nav aria-label="breadcrumb" class="">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a class="text-decoration-none text-dark"
                                     href="index.php">Home</a>
                             </li>
-                            <li class="breadcrumb-item active" aria-current="page">Hotel</li>
+                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
                         </ol>
                     </nav>
                     <div>

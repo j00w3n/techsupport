@@ -14,3 +14,30 @@ table th {
 html {
     width: 100vw;
 }
+
+body {
+    background-color: #F8F8F8;
+}
+
+nav ol {
+    margin-bottom: 0 !important;
+}
+
+.breadcrumb-container {
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+}
+
+.job-list-item .job-list-title {
+    font-size: 14px !important;
+}
+
+.job-list-item .job-list-title span {
+    font-size: 10px !important;
+}
+
+.text-grey {
+    color: #a9acaf !important;
+}

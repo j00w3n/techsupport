@@ -90,34 +90,8 @@
                         <label for="fault">Description of Fault</label>
                         <textarea type="text" class="form-control" id="fault" name="fault"></textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="repair">Description of repair</label>
-                        <textarea type="text" class="form-control" id="repair" name="repair"></textarea>
-                    </div>
                 </div>
 
-                <!-- Installation Fields -->
-                <div id="section-installation" class="task-section d-none">
-                    <div class="form-group">
-                        <label for="installation_note">Installation Note</label>
-                        <textarea class="form-control" name="installation_note"></textarea>
-                    </div>
-                </div>
-
-                <!-- Dismantle Fields -->
-                <div id="section-dismantle" class="task-section d-none">
-                    <div class="form-group">
-                        <label for="dismantle_note">Dismantle Note</label>
-                        <textarea class="form-control" name="dismantle_note"></textarea>
-                    </div>
-                </div>
-                <!-- Dismantle Fields -->
-                <div id="section-maintanance" class="task-section d-none">
-                    <div class="form-group">
-                        <label for="maintenance_note">Maintanance Note</label>
-                        <textarea class="form-control" name="maintenance_note"></textarea>
-                    </div>
-                </div>
                 <div class="form-group" id="partupdatedsection">
                     <label for="partreplaced">Item update</label>
                     <div id="item-container">
@@ -210,18 +184,6 @@
         signaturePad.on();
     </script> -->
   
-    <script>
-        const taskRadios = document.querySelectorAll('input[name="task"]');
-        const sections = document.querySelectorAll('.task-section');
-
-        taskRadios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                sections.forEach(section => section.classList.add('d-none'));
-                const selected = radio.value;
-                document.getElementById('section-' + selected).classList.remove('d-none');
-            });
-        });
-    </script>
 
     <script>
         document.getElementById('addItem').addEventListener('click', function () {

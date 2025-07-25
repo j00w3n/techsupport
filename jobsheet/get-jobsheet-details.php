@@ -1,20 +1,15 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $jobsheetId = intval($_POST['id']);
 
     $stmt = $conn->prepare("
         SELECT 
-            j.id,
-            j.date,
-            j.time,
+            j.*,
+            DATE_FORMAT(j.date, '%d %M %Y') AS date,
             h.name AS hotel_name,
             p.picname AS person_name,
-            j.task_type,
-            j.complaint,
-            j.fault,
-            j.repair,
             GROUP_CONCAT(CONCAT(i.name, ' (x', ji.quantity, ')') SEPARATOR ', ') AS items_used
         FROM 
             jobsheet j
@@ -39,14 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 
     while ($row = $result->fetch_assoc()) {
         echo "
-        <div class='info'><span class=''>Hotel Name: </span>".$row['hotel_name']."</div>
-        <div class='info'><span class=''>Date: </span>".$row['date']." ".$row['time']."</div>
-        <div class='info'><span class=''>Task: </span>".$row['task_type']."</div>
-        <div class='info'><span class=''>Person: </span>".$row['person_name']."</div>
-        <div class='info'><span class=''>Complaint: </span>".$row['complaint']."</div>
-        <div class='info'><span class=''>Fault: </span>".$row['fault']."</div>
-        <div class='info'><span class=''>Repair: </span>".$row['repair']."</div>
-        <div class='info'><span class=''>Items Used: </span>".$row['items_used']."</div>
+        <div class='info'><span class=''>Hotel Name: </span>" . $row['hotel_name'] . "</div>
+        <div class='info'><span class=''>Date: </span>" . $row['date'] . " " . $row['time'] . "</div>
+        <div class='info'><span class=''>Task: </span>" . $row['task_type'] . "</div>
+        <div class='info'><span class=''>Person: </span>" . $row['person_name'] . "</div>
+        <div class='info'><span class=''>Complaint: </span>" . $row['description'] . "</div>
+        <div class='info'><span class=''>Items Used: </span>" . $row['items_used'] . "</div>
         ";
     }
     $stmt->close();
