@@ -388,6 +388,11 @@ ORDER BY
                     <canvas id="jobsheetChart" width="100%" height=""></canvas>
                 </div>
             </div>
+            <div class="col-lg-4">
+                <div class="border bg-white rounded-3 h-100 p-3 fw-bold">
+
+                </div>
+            </div>
         </div>
         <div class="row mt-4 d-none">
             <div class="col-lg-12">
