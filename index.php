@@ -136,7 +136,7 @@
                     <select class="form-control" id="pic" name="pic">
                         <option value="" selected>Select person</option>
                     </select>
-                    
+
                 </div>
                 <div class="form-group">
                     <label for="complaint">New staff</label>
@@ -183,10 +183,10 @@
         // Rebinds all event handlers
         signaturePad.on();
     </script> -->
-  
+
 
     <script>
-        document.getElementById('addItem').addEventListener('click', function () {
+        document.getElementById('addItem').addEventListener('click', function() {
             const container = document.getElementById('item-container');
             const firstRow = container.querySelector('.item-row');
             const newRow = firstRow.cloneNode(true);
@@ -195,7 +195,7 @@
         });
 
         // Delegate remove button
-        document.getElementById('item-container').addEventListener('click', function (e) {
+        document.getElementById('item-container').addEventListener('click', function(e) {
             if (e.target.classList.contains('remove-item')) {
                 const rows = document.querySelectorAll('.item-row');
                 if (rows.length > 1) e.target.closest('.item-row').remove();
@@ -203,20 +203,22 @@
         });
     </script>
     <script>
-        document.getElementById('pic').addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const email = selectedOption.getAttribute('data-email');
-        const filledemail=document.getElementById('picemail').value = email || '';
-        filledemail.readOnly = true;
-    });
-        $('#hotelname').on('change', function () {
+        document.getElementById('pic').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const email = selectedOption.getAttribute('data-email');
+            const filledemail = document.getElementById('picemail').value = email || '';
+            filledemail.readOnly = true;
+        });
+        $('#hotelname').on('change', function() {
             var hotelId = $(this).val();
 
             $.ajax({
-                url: 'get_hotel_person.php',
+                url: 'pic/get_hotel_person.php',
                 type: 'POST',
-                data: { hotel_id: hotelId },
-                success: function (data) {
+                data: {
+                    hotel_id: hotelId
+                },
+                success: function(data) {
                     $('#pic').html(data); // Replace options
                 }
             });
