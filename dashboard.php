@@ -59,446 +59,307 @@ ORDER BY
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIVTech Support</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
-        crossorigin="anonymous"></script> <!-- script type="text/javascript" src="js/date_time.js"></script -->
-    <!-- script type="text/javascript" src="engine1/jquery.js"></script -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
-        integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
+    <title>VIVTech Support - Dashboard</title>
+    
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- JQuery, DataTables & Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        body {
-            overflow-x: hidden;
-        }
-
-        table thead tr th {
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .count-box {
-            background: #fff;
-            transition: all 0.3s ease-in-out;
-            padding: 0px 10px;
-            border-radius: 10px;
-        }
-
-        .count-box:hover {
-            background: #007bff;
-        }
-
-        .count-box:hover .count-header .link-box {
-            border: 1px solid #fff;
-        }
-
-        .count-box:hover .count-header .link-box i {
-            color: #fff;
-        }
-
-        .count-box:hover .count-header .count-title {
-            color: #fff;
-        }
-
-        .count-box:hover .count-body p {
-            color: #fff;
-        }
-
-        .count-box:hover .count-body span {
-            color: #fff;
-        }
-
-        .count-header {
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .count-title {
-            font-size: 16px;
-            font-weight: bold;
-            /* color: #007bff; */
-            color: #000;
-            padding: 0px 10px;
-        }
-
-        .count-body p {
-            font-size: 30px;
-            font-weight: bold;
-            color: #000;
-            padding: 10px;
-        }
-
-        .count-body span {
-            font-size: 14px;
-            font-weight: lighter !important;
-            color: darkgrey;
-        }
-
-        .link-box {
-            border: 1px solid #007bff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .link-box i {
-            color: #007bff;
-            transform: rotate(45deg);
-            transition: all 0.3s ease;
-        }
-
-        .link-box:hover {
-            background-color: #fff;
-        }
-
-        .link-box:hover i {
-            color: #007bff !important;
-            transform: rotate(90deg);
-        }
-    </style>
 </head>
 
+<body class="bg-slate-100 text-slate-800 font-sans antialiased overflow-x-hidden">
 
-<body>
-    <?php include 'navbar.html'; ?>
-    <!-- modal for jobsheet details -->
-    <div class="modal fade" id="jobsheetDetailsModal" tabindex="-1" aria-labelledby="jobsheetDetailsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="jobsheetDetailsModalLabel">Jobsheet Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="jobsheetDetailsBody">
+    <?php include 'navbar.php'; ?>
 
-                </div>
+    <!-- Modal for Jobsheet Details -->
+    <div id="jobsheetDetailsModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl border border-slate-200 max-w-2xl w-full overflow-hidden transform transition-all">
+            <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                <h5 class="text-md font-bold text-white uppercase tracking-wider" id="jobsheetDetailsModalLabel">
+                    <i class="fas fa-info-circle text-sky-500 mr-2"></i>Jobsheet Details
+                </h5>
+                <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 max-h-[75vh] overflow-y-auto text-slate-700" id="jobsheetDetailsBody">
+                <!-- Content injected via AJAX -->
             </div>
         </div>
     </div>
-    <div class="container">
-        <div class="row my-3">
-            <div class="col-lg-12">
-                <div class="breadcrumb-container d-flex flex-row bg-white justify-content-between align-items-center">
-                    <nav aria-label="breadcrumb" class="">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a class="text-decoration-none text-dark"
-                                    href="index.php">Home</a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                        </ol>
-                    </nav>
-                    <div>
-                        <a href="index.php" class="btn btn-sm btn-primary px-3"><i
-                                class="fa-solid fa-pen pe-2"></i>Jobsheet
-                            Form</a>
-                    </div>
-                </div>
-            </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        
+        <!-- Breadcrumb & Top Bar -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm gap-4">
+            <nav class="text-sm font-medium text-slate-500">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="index.php" class="text-slate-600 hover:text-sky-600 transition"><i class="fas fa-home mr-2"></i>Home</a>
+                    </li>
+                    <li class="flex items-center text-slate-400">
+                        <i class="fas fa-chevron-right text-xs mx-2"></i>
+                        <span class="text-slate-400">Dashboard</span>
+                    </li>
+                </ol>
+            </nav>
+            <a href="index.php" class="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm transition">
+                <i class="fa-solid fa-plus"></i> New Jobsheet
+            </a>
         </div>
-        <div class="row">
-            <div class="col-lg-6 col-12">
-                <div>
-                    <div class="row">
-                        <div class="col-lg-6 col-12 mb-sm-3 mb-lg-0">
-                            <div class="border count-box box">
-                                <div class="count-header">
-                                    <p class="mb-0 count-title">Total Jobsheet</p>
-                                    <div class="link-box ">
-                                        <a href="#"><i class="fa-solid fa-arrow-up"></i></a>
-                                    </div>
-                                </div>
-                                <div class="count-body">
-                                    <p>
-                                        <?php
-                                        $stmt = $conn->prepare("SELECT COUNT(*) AS total_jobsheet FROM jobsheet");
-                                        $stmt->execute();
-                                        $result = $stmt->get_result();
-                                        $row = $result->fetch_assoc();
-                                        echo $row['total_jobsheet'];
-                                        ?>
-                                        <span>sheets</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-12">
-                            <div class="border count-box box">
-                                <div class="count-header">
-                                    <p class="mb-0 count-title">Total PIC</p>
-                                    <div class="link-box ">
-                                        <a href="#"><i class="fa-solid fa-arrow-up"></i></a>
-                                    </div>
-                                </div>
-                                <div class="count-body">
-                                    <p>
-                                        <?php
-                                        $stmt = $conn->prepare("SELECT COUNT(*) AS total_pic FROM hotel_person");
-                                        $stmt->execute();
-                                        $result = $stmt->get_result();
-                                        $row = $result->fetch_assoc();
-                                        echo $row['total_pic'];
-                                        ?>
-                                        <span>persons</span>
-                                    </p>
-                                </div>
-                            </div>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Column: Counter Cards -->
+            <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 content-start">
+                
+                <!-- Card 1: Total Jobsheet -->
+                <div class="group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-400">Total Jobsheet</span>
+                        <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-slate-700 group-hover:text-sky-400 transition duration-300">
+                            <i class="fas fa-file-alt text-sm"></i>
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-lg-6 col-12 mb-sm-3 mb-lg-0 mb-3">
-                            <div class="border count-box box">
-                                <div class="count-header">
-                                    <p class="mb-0 count-title">Total Hotels</p>
-                                    <div class="link-box ">
-                                        <a href="#"><i class="fa-solid fa-arrow-up"></i></a>
-                                    </div>
-                                </div>
-                                <div class="count-body">
-                                    <p>
-                                        <?php
-                                        $stmt = $conn->prepare("SELECT COUNT(*) AS total_hotel FROM hotel");
-                                        $stmt->execute();
-                                        $result = $stmt->get_result();
-                                        $row = $result->fetch_assoc();
-                                        echo $row['total_hotel'];
-                                        ?>
-                                        <span>hotels</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-12">
-                            <div class="border count-box box mb-sm-3 mb-lg-0 mb-3">
-                                <div class="count-header">
-                                    <p class="mb-0 count-title">Total Items</p>
-                                    <div class="link-box ">
-                                        <a href="#"><i class="fa-solid fa-arrow-up"></i></a>
-                                    </div>
-                                </div>
-                                <div class="count-body">
-                                    <p>
-                                        <?php
-                                        $stmt = $conn->prepare("SELECT COUNT(*) AS total_items FROM items");
-                                        $stmt->execute();
-                                        $result = $stmt->get_result();
-                                        $row = $result->fetch_assoc();
-                                        echo $row['total_items'];
-                                        ?>
-                                        <span>items</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-black tracking-tight text-slate-900 group-hover:text-white transition duration-300">
+                            <?php
+                            $stmt = $conn->prepare("SELECT COUNT(*) AS total_jobsheet FROM jobsheet");
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            $row = $result->fetch_assoc();
+                            echo $row['total_jobsheet'];
+                            ?>
+                        </span>
+                        <span class="text-xs font-normal text-slate-400 group-hover:text-slate-500">sheets</span>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 col-12">
-                <div class="border bg-white rounded-3 p-3 h-100 fw-bold">
-                    <div class="job-list-header d-flex justify-content-between">
-                        <h5 class="mb-3"><i class="fa-regular text-primary fa-bell pe-3"></i>Jobs Updates</h5>
-                        <div data-bs-toggle="tooltip" data-bs-placement="top" title="View All">
-                            <a target="_blank" href="jobsheet-list.php" class="text-grey px-3">
-                                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 13px;"></i>
-                            </a>
+
+                <!-- Card 2: Total PIC -->
+                <div class="group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-400">Total PIC</span>
+                        <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-slate-700 group-hover:text-sky-400 transition duration-300">
+                            <i class="fas fa-user-tie text-sm"></i>
                         </div>
                     </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-black tracking-tight text-slate-900 group-hover:text-white transition duration-300">
+                            <?php
+                            $stmt = $conn->prepare("SELECT COUNT(*) AS total_pic FROM hotel_person");
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            $row = $result->fetch_assoc();
+                            echo $row['total_pic'];
+                            ?>
+                        </span>
+                        <span class="text-xs font-normal text-slate-400 group-hover:text-slate-500">persons</span>
+                    </div>
+                </div>
 
-                    <?php while ($row = $jobsheetResult->fetch_assoc()): ?>
-                        <?php
-                        $datetime1 = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
+                <!-- Card 3: Total Hotels -->
+                <div class="group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-400">Total Hotels</span>
+                        <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-slate-700 group-hover:text-sky-400 transition duration-300">
+                            <i class="fas fa-hotel text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-black tracking-tight text-slate-900 group-hover:text-white transition duration-300">
+                            <?php
+                            $stmt = $conn->prepare("SELECT COUNT(*) AS total_hotel FROM hotel");
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            $row = $result->fetch_assoc();
+                            echo $row['total_hotel'];
+                            ?>
+                        </span>
+                        <span class="text-xs font-normal text-slate-400 group-hover:text-slate-500">hotels</span>
+                    </div>
+                </div>
 
-                        $datetimeString = $row['date'] . ' ' . $row['time']; // e.g., "24 July 2025 02:00 PM"
-                        $datetime2 = DateTime::createFromFormat('d F Y h:i A', $datetimeString, new DateTimeZone('Asia/Kuala_Lumpur'));
+                <!-- Card 4: Total Items -->
+                <div class="group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-400">Total Items</span>
+                        <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-slate-700 group-hover:text-sky-400 transition duration-300">
+                            <i class="fas fa-boxes text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-black tracking-tight text-slate-900 group-hover:text-white transition duration-300">
+                            <?php
+                            $stmt = $conn->prepare("SELECT COUNT(*) AS total_items FROM items");
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            $row = $result->fetch_assoc();
+                            echo $row['total_items'];
+                            ?>
+                        </span>
+                        <span class="text-xs font-normal text-slate-400 group-hover:text-slate-500">items</span>
+                    </div>
+                </div>
 
-                        if (!$datetime2) {
-                            echo "Failed to parse datetime";
-                        } else {
-                            $interval = $datetime1->diff($datetime2);
+            </div>
 
-                            if ($interval->d > 0) {
-                                $time = $interval->d . ' day' . ($interval->d > 1 ? 's' : '') . ' ago';
-                            } else if ($interval->h > 0) {
-                                $time = $interval->h . ' hour' . ($interval->h > 1 ? 's' : '') . ' ago';
-                            } else if ($interval->i > 0) {
-                                $time = $interval->i . ' min ago';
-                            } else {
-                                $time = 'just now';
+            <!-- Right Column: Jobs Updates Log -->
+            <div class="lg:col-span-5 bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                        <h5 class="text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                            <i class="far fa-bell text-sky-500"></i> Jobs Updates
+                        </h5>
+                        <a target="_blank" href="jobsheet-list.php" class="text-slate-400 hover:text-sky-600 transition">
+                            <i class="fas fa-external-link-alt text-xs"></i>
+                        </a>
+                    </div>
+
+                    <div class="space-y-3 max-h-[260px] overflow-y-auto pr-1">
+                        <?php while ($row = $jobsheetResult->fetch_assoc()): 
+                            $datetime1 = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
+                            $datetimeString = $row['date'] . ' ' . $row['time']; 
+                            $datetime2 = DateTime::createFromFormat('d F Y h:i A', $datetimeString, new DateTimeZone('Asia/Kuala_Lumpur'));
+
+                            $time = 'just now';
+                            if ($datetime2) {
+                                $interval = $datetime1->diff($datetime2);
+                                if ($interval->d > 0) $time = $interval->d . ' day' . ($interval->d > 1 ? 's' : '') . ' ago';
+                                else if ($interval->h > 0) $time = $interval->h . ' hour' . ($interval->h > 1 ? 's' : '') . ' ago';
+                                else if ($interval->i > 0) $time = $interval->i . ' min ago';
                             }
 
-                        }
-
-
-                        $currDate = $row['date'];
-                        $task_type = $row['task_type'];
-                        $id = $row['id'];
-
-                        $dotcolor = ($task_type == "installation") ? "text-success" : (($task_type == "troubleshoot") ? "text-warning" : "text-warning");
-                        $icon = ($task_type == "installation") ? "fa-wrench" : (($task_type == "troubleshoot") ? "fa-gear" : "fa-wrench");
+                            $task_type = strtolower($row['task_type']);
+                            $is_install = ($task_type == "installation");
+                            
+                            $icon_class = $is_install ? "fa-wrench text-emerald-500" : "fa-cog text-amber-500";
                         ?>
-
-                        <div class="job-list-item border position-relative p-2 rounded-3 d-flex flex-row mb-2">
-                            <div class="d-flex align-items-center ps-2 pe-3">
-                                <div class="job-list-icon">
-                                    <i class="fa-solid fa-circle <?php echo $dotcolor; ?>" style="font-size: 8px;"></i>
+                            <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition duration-150">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2.5 h-2.5 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-circle text-[8px] <?= $is_install ? 'text-emerald-500' : 'text-amber-500' ?>"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-800 capitalize flex items-center gap-1.5">
+                                            <i class="fas <?= $icon_class ?> text-xs"></i> 
+                                            <?= htmlspecialchars($task_type) ?> at <span class="font-bold text-slate-900"><?= htmlspecialchars($row["hotel_name"]) ?></span>
+                                        </p>
+                                        <span class="text-xs text-slate-400 font-medium"><?= $time ?></span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
-                                <p class="mb-0 job-list-title text-capitalize"><i
-                                        class="fa-solid <?php echo $icon; ?> pe-2"></i><?php echo $task_type; ?> at
-                                    <?php echo $row["hotel_name"]; ?>
-                                </p>
-                                <small id="jobTime" class="text-muted fw-lighter"><?php echo $time; ?></small>
-                            </div>
-                            <div class="position-absolute top-50 end-0 translate-middle">
-                                <!-- <a class="view-details-btn" style="cursor: pointer;" data-bs-toggle="modal"
-                                    data-bs-target="#jobsheetDetailsModal" data-id="<?php echo $row['id']; ?>">
-                                    <i class="fa-solid fa-right-from-bracket me-2"></i>
-                                </a> -->
-                                <a href="generatepdf.php?id=<?= $row['id'] ?>" class="text-primary" target="_blank">
-                                    <i class="fa-solid fa-right-from-bracket me-2"></i>
+                                <a href="generatepdf.php?id=<?= $row['id'] ?>" class="text-slate-400 hover:text-sky-600 p-1 transition" target="_blank">
+                                    <i class="fas fa-file-pdf text-sm"></i>
                                 </a>
                             </div>
+                        <?php endwhile; ?>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Section: Charts & Operations -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Line Chart container -->
+            <div class="lg:col-span-8 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <h5 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Analytics Overview</h5>
+                <div class="w-full">
+                    <canvas id="jobsheetChart" class="max-h-[320px]"></canvas>
+                </div>
+            </div>
+            
+            <!-- System Status Sidebar -->
+            <div class="lg:col-span-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div>
+                    <h5 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">System Status</h5>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-xs font-semibold p-2.5 bg-emerald-50 text-emerald-800 rounded-lg border border-emerald-100">
+                            <span>Database Core</span>
+                            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Online</span>
                         </div>
-                    <?php endwhile; ?>
+                        <div class="flex justify-between items-center text-xs font-semibold p-2.5 bg-slate-50 text-slate-700 rounded-lg border border-slate-200">
+                            <span>Port Binding</span>
+                            <span class="text-slate-500 font-mono">3307 TCP</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-[11px] text-slate-400 font-medium pt-4 border-t border-slate-100">
+                    VIVTech Operation Suite • Active Session
                 </div>
             </div>
         </div>
-        <div class="row my-3">
-            <div class="col-lg-8">
-                <div class="border bg-white rounded-3 p-3 fw-bold">
-                    <canvas id="jobsheetChart" width="100%" height=""></canvas>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="border bg-white rounded-3 h-100 p-3 fw-bold">
 
-                </div>
-            </div>
-        </div>
-        <div class="row mt-4 d-none">
-            <div class="col-lg-12">
-                <h4 class="py-2">Jobsheet List</h4>
-                <div class="table-responsive">
-                    <table id="jobsheetTable" class="table table-bordered table-striped mb-5">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Hotel Name</th>
-                                <th>Task</th>
-                                <th>PIC</th>
-                                <th>Description</th>
-                                <th>Items Used</th>
-                                <th>Actions</th>
+        <!-- Section: Data Table Area (Hidden with 'hidden' Tailwind class) -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hidden">
+            <h4 class="text-md font-bold text-slate-800 mb-4 uppercase tracking-wider">Jobsheet Master List</h4>
+            <div class="overflow-x-auto">
+                <table id="jobsheetTable" class="w-full text-sm text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900 text-white text-xs uppercase tracking-wider">
+                            <th class="p-3 border border-slate-800 text-center whitespace-nowrap overflow-hidden text-ellipsis">Date</th>
+                            <th class="p-3 border border-slate-800 text-center whitespace-nowrap overflow-hidden text-ellipsis">Time</th>
+                            <th class="p-3 border border-slate-800 text-center whitespace-nowrap overflow-hidden text-ellipsis">Hotel Name</th>
+                            <th class="p-3 border border-slate-800 text-center whitespace-nowrap overflow-hidden text-ellipsis">Task</th>
+                            <th class="p-3 border border-slate-800 text-center whitespace-nowrap overflow-hidden text-ellipsis">PIC</th>
+                            <th class="p-3 border border-slate-800 text-center whitespace-nowrap overflow-hidden text-ellipsis">Description</th>
+                            <th class="p-3 border border-slate-800 text-center whitespace-nowrap overflow-hidden text-ellipsis">Items Used</th>
+                            <th class="p-3 border border-slate-800 text-center whitespace-nowrap overflow-hidden text-ellipsis">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 bg-white">
+                        <?php while ($row = $jobsheetResult1->fetch_assoc()): ?>
+                            <tr class="hover:bg-slate-50 transition text-slate-700">
+                                <td class="p-3 font-medium text-slate-900"><?= htmlspecialchars($row["date"]) ?></td>
+                                <td class="p-3"><?= htmlspecialchars($row["time"]) ?></td>
+                                <td class="p-3 font-semibold"><?= htmlspecialchars($row["hotel_name"]) ?></td>
+                                <td class="p-3"><span class="px-2 py-0.5 text-xs font-bold rounded-full border bg-slate-100 text-slate-800 uppercase"><?= htmlspecialchars($row["task_type"]) ?></span></td>
+                                <td class="p-3"><?= htmlspecialchars($row["person_name"]) ?></td>
+                                <td class="p-3 truncate max-w-[150px]"><?= htmlspecialchars($row["description"]) ?></td>
+                                <td class="p-3"><?= htmlspecialchars($row["items_used"]) ?></td>
+                                <td class="p-3">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <button class="view-details-btn p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition" data-id="<?= $row['id'] ?>"><i class="fas fa-eye text-xs"></i></button>
+                                        <button class="edit-jobsheet-btn p-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded transition" data-id="<?= $row['id'] ?>"><i class="fas fa-edit text-xs"></i></button>
+                                        <button class="delete-jobsheet-btn p-1.5 bg-red-600 hover:bg-red-700 text-white rounded transition" data-id="<?= $row['id'] ?>"><i class="fas fa-trash text-xs"></i></button>
+                                        <a href="mailto:<?= $row['person_email'] ?>?subject=Support%20Job%20Update" class="p-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded transition"><i class="fas fa-envelope text-xs"></i></a>
+                                        <a href="generatepdf.php?id=<?= $row['id'] ?>" class="p-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded transition" target="_blank"><i class="fas fa-file-pdf text-xs"></i></a>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $jobsheetResult1->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?php echo $row["date"]; ?></td>
-                                    <td><?php echo $row["time"]; ?></td>
-                                    <td><?php echo $row["hotel_name"]; ?></td>
-                                    <td><?php echo $row["task_type"]; ?></td>
-                                    <td><?php echo $row["person_name"]; ?></td>
-                                    <td><?php echo $row["description"]; ?></td>
-                                    <td><?php echo $row["items_used"]; ?></td>
-                                    <td>
-                                        <div class="d-flex flex-row" style="gap: 5px;">
-                                            <button class="btn btn-sm btn-secondary view-details-btn" data-bs-toggle="modal"
-                                                data-bs-target="#jobsheetDetailsModal" data-id="<?php echo $row['id']; ?>">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-warning edit-jobsheet-btn"
-                                                data-id="<?= $row['id'] ?>">
-                                                <i class="fa-solid fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger delete-jobsheet-btn"
-                                                data-id="<?= $row['id'] ?>">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                            <a href="mailto:<?= $row['person_email'] ?>?subject=Support%20Job%20Update&body=Dear%20<?= urlencode($row['person_name']) ?>,"
-                                                class="btn btn-sm btn-info">
-                                                <i class="fa-solid fa-envelope"></i>
-                                            </a>
-                                            <a href="generatepdf.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-success"
-                                                target="_blank">
-                                                <i class="fa-solid fa-file-pdf"></i>
-                                            </a>
-
-                                        </div>
-                                    </td>
-
-                                </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                </div>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
-    <script>
-        fetch('jobsheet-data-chart.php')
-            .then(res => res.json())
-            .then(data => {
-                const labels = data.map(row => row.month);
-                const values = data.map(row => row.total);
 
-                new Chart(document.getElementById('jobsheetChart'), {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Jobsheets per Month',
-                            data: values,
-                            borderColor: 'rgb(75, 192, 192)'
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }
-                });
-            });
-    </script>
+    </div>
+
+    <!-- Scripts Logic -->
     <script>
-        //view modal details on jobsheet
+        function closeModal() {
+            document.getElementById('jobsheetDetailsModal').classList.add('hidden');
+        }
+
         $(document).ready(function () {
             $('.view-details-btn').on('click', function () {
                 const jobsheetId = $(this).data('id');
-
                 $.ajax({
                     url: 'jobsheet/get-jobsheet-details.php',
                     type: 'POST',
                     data: { id: jobsheetId },
                     success: function (response) {
                         $('#jobsheetDetailsBody').html(response);
-                        $('#viewJobsheetModal').modal('show'); // Show the modal
+                        document.getElementById('jobsheetDetailsModal').classList.remove('hidden');
                     }
                 });
             });
-        });
-        //delete jobsheet
-        $(document).ready(function () {
+
             $('.delete-jobsheet-btn').on('click', function () {
                 const id = $(this).data('id');
                 if (confirm('Are you sure you want to delete this jobsheet?')) {
@@ -511,17 +372,46 @@ ORDER BY
                                 location.reload();
                             } else {
                                 alert('❌ Failed to delete jobsheet.');
-                                console.log('Response:', response);
                             }
-                        },
-                        error: function (xhr, status, error) {
-                            alert('❌ Failed to delete jobsheet.');
-                            console.log('Error:', error);
                         }
                     });
                 }
             });
         });
+
+        // Chart.js Configuration
+        fetch('jobsheet-data-chart.php')
+            .then(res => res.json())
+            .then(data => {
+                const labels = data.map(row => row.month);
+                const values = data.map(row => row.total);
+
+                new Chart(document.getElementById('jobsheetChart'), {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Jobsheets Filled',
+                            data: values,
+                            borderColor: '#0284c7',
+                            backgroundColor: 'rgba(2, 132, 199, 0.05)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#0284c7'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { color: '#f1f5f9' }, beginAtZero: true },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            });
     </script>
 </body>
 
