@@ -1,6 +1,6 @@
 <?php
-// Dapatkan nama fail semasa (contoh: index.php, dashboard.php)
-$current_page = basename($_SERVER['PHP_SELF']);
+    // Dapatkan nama fail semasa (contoh: index.php, dashboard.php)
+    $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <nav class="bg-slate-900 border-b border-slate-800 shadow-lg">
@@ -19,18 +19,22 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <a href="index.php" class="px-3 py-2 rounded-md text-sm font-medium transition duration-150 <?= ($current_page == 'index.php' || $current_page == '') ? 'bg-sky-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
                         <i class="fas fa-edit mr-1 text-xs"></i> Form
                     </a>
-
+                    
                     <a href="dashboard.php" class="px-3 py-2 rounded-md text-sm font-medium transition duration-150 <?= ($current_page == 'dashboard.php') ? 'bg-sky-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
                         <i class="fas fa-chart-pie mr-1 text-xs"></i> Dashboard
                     </a>
 
+                    <a href="jobsheet-list.php" class="px-3 py-2 rounded-md text-sm font-medium transition duration-150 <?= ($current_page == 'jobsheet-list.php') ? 'bg-sky-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
+                        <i class="fas fa-stream mr-1 text-xs"></i> Jobsheet
+                    </a>
+                    
                     <a href="hotel.php" class="px-3 py-2 rounded-md text-sm font-medium transition duration-150 <?= ($current_page == 'hotel.php') ? 'bg-sky-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
                         <i class="fas fa-hotel mr-1 text-xs"></i> Hotels
                     </a>
 
-                    <a href="item-catalog.php" class="px-3 py-2 rounded-md text-sm font-medium transition duration-150 <?= ($current_page == 'item-catalog.php') ? 'bg-sky-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
+                    <!-- <a href="item-catalog.php" class="px-3 py-2 rounded-md text-sm font-medium transition duration-150 <?= ($current_page == 'item-catalog.php') ? 'bg-sky-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
                         <i class="fas fa-boxes mr-1 text-xs"></i> Item
-                    </a>
+                    </a> -->
 
                 </div>
             </div>
@@ -51,12 +55,15 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <a href="dashboard.php" class="block px-3 py-2 rounded-md text-base font-medium <?= ($current_page == 'dashboard.php') ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
             <i class="fas fa-chart-pie mr-2 text-sm"></i> Dashboard
         </a>
+        <a href="jobsheet-list.php" class="block px-3 py-2 rounded-md text-base font-medium <?= ($current_page == 'jobsheet-list.php') ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
+            <i class="fas fa-stream mr-2 text-sm"></i> Jobsheet
+        </a>
         <a href="hotel.php" class="block px-3 py-2 rounded-md text-base font-medium <?= ($current_page == 'hotel.php') ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
             <i class="fas fa-hotel mr-2 text-sm"></i> Hotels
         </a>
-        <a href="item-catalog.php" class="block px-3 py-2 rounded-md text-base font-medium <?= ($current_page == 'item-catalog.php') ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
+        <!-- <a href="item-catalog.php" class="block px-3 py-2 rounded-md text-base font-medium <?= ($current_page == 'item-catalog.php') ? 'bg-sky-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' ?>">
             <i class="fas fa-boxes mr-2 text-sm"></i> Item
-        </a>
+        </a> -->
     </div>
 </nav>
 

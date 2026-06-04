@@ -1,21 +1,20 @@
 <?php
 include 'db.php';
-$hotelperson = $conn->query("SELECT h.name AS hotel_name, p.picname AS person_name FROM hotel h JOIN hotel_person p ON h.id = p.hotel_id ORDER BY h.name, p.picname;");
+
+// 1. Tarik 3 jobsheet terbaru (Untuk paparan Recent Activity / Quick View)
 $jobsheetResult = $conn->query("
 SELECT 
     j.*,
     DATE_FORMAT(j.date, '%d %M %Y') AS date,
     TIME_FORMAT(j.time, '%H:%i %p') AS time,
     h.name AS hotel_name,
-    p.picname AS person_name,
-    p.email AS person_email,
+    j.pic_name AS person_name,   -- 🌟 TUKAR SINI: Ambil terus dari jobsheet
+    j.pic_email AS person_email, -- 🌟 TUKAR SINI: Ambil terus dari jobsheet
     GROUP_CONCAT(CONCAT(i.name, ' (x', ji.quantity, ')') SEPARATOR ', ') AS items_used
 FROM 
     jobsheet j
 JOIN 
     hotel h ON j.hotel_id = h.id
-LEFT JOIN 
-    hotel_person p ON j.person_id = p.picid
 LEFT JOIN 
     jobsheet_items ji ON j.id = ji.jobsheet_id
 LEFT JOIN 
@@ -26,21 +25,21 @@ ORDER BY
     j.date DESC, j.time DESC
 LIMIT 3;
 ");
+
+// 2. Tarik semua jobsheet (Untuk paparan Master List penuh)
 $jobsheetResult1 = $conn->query("
 SELECT 
-j.*,
-DATE_FORMAT(j.date, '%d %M %Y') AS date,
-TIME_FORMAT(j.time, '%H:%i %p') AS time,
-h.name AS hotel_name,
-p.picname AS person_name,
-p.email AS person_email,
-GROUP_CONCAT(CONCAT(i.name, ' (x', ji.quantity, ')') SEPARATOR ', ') AS items_used
+    j.*,
+    DATE_FORMAT(j.date, '%d %M %Y') AS date,
+    TIME_FORMAT(j.time, '%H:%i %p') AS time,
+    h.name AS hotel_name,
+    j.pic_name AS person_name,   -- 🌟 TUKAR SINI: Ambil terus dari jobsheet
+    j.pic_email AS person_email, -- 🌟 TUKAR SINI: Ambil terus dari jobsheet
+    GROUP_CONCAT(CONCAT(i.name, ' (x', ji.quantity, ')') SEPARATOR ', ') AS items_used
 FROM 
     jobsheet j
 JOIN 
     hotel h ON j.hotel_id = h.id
-LEFT JOIN 
-    hotel_person p ON j.person_id = p.picid
 LEFT JOIN 
     jobsheet_items ji ON j.id = ji.jobsheet_id
 LEFT JOIN 
@@ -48,10 +47,8 @@ LEFT JOIN
 GROUP BY 
     j.id
 ORDER BY 
-    j.date DESC;
-
+    j.date DESC, j.time DESC; -- Ditambah susunan masa sekali supaya tersusun rapat
 ");
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -60,11 +57,11 @@ ORDER BY
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIVTech Support - Dashboard</title>
-    
+
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+
     <!-- JQuery, DataTables & Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
@@ -94,7 +91,7 @@ ORDER BY
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        
+
         <!-- Breadcrumb & Top Bar -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm gap-4">
             <nav class="text-sm font-medium text-slate-500">
@@ -115,12 +112,12 @@ ORDER BY
 
         <!-- Main Layout Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+
             <!-- Left Column: Counter Cards -->
             <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 content-start">
-                
+
                 <!-- Card 1: Total Jobsheet -->
-                <div class="group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36">
+                <a href="jobsheet-list.php" class="group block bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36 cursor-pointer decoration-none">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-400">Total Jobsheet</span>
                         <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-slate-700 group-hover:text-sky-400 transition duration-300">
@@ -135,36 +132,14 @@ ORDER BY
                             $result = $stmt->get_result();
                             $row = $result->fetch_assoc();
                             echo $row['total_jobsheet'];
+                            $stmt->close(); // Tutup stmt untuk amalan coding yang baik
                             ?>
                         </span>
                         <span class="text-xs font-normal text-slate-400 group-hover:text-slate-500">sheets</span>
                     </div>
-                </div>
+                </a>
 
-                <!-- Card 2: Total PIC -->
-                <div class="group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36">
-                    <div class="flex justify-between items-start">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-400">Total PIC</span>
-                        <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-slate-700 group-hover:text-sky-400 transition duration-300">
-                            <i class="fas fa-user-tie text-sm"></i>
-                        </div>
-                    </div>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl font-black tracking-tight text-slate-900 group-hover:text-white transition duration-300">
-                            <?php
-                            $stmt = $conn->prepare("SELECT COUNT(*) AS total_pic FROM hotel_person");
-                            $stmt->execute();
-                            $result = $stmt->get_result();
-                            $row = $result->fetch_assoc();
-                            echo $row['total_pic'];
-                            ?>
-                        </span>
-                        <span class="text-xs font-normal text-slate-400 group-hover:text-slate-500">persons</span>
-                    </div>
-                </div>
-
-                <!-- Card 3: Total Hotels -->
-                <div class="group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36">
+                <a href="hotel.php" class="group block bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36 cursor-pointer decoration-none">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-400">Total Hotels</span>
                         <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-slate-700 group-hover:text-sky-400 transition duration-300">
@@ -179,14 +154,15 @@ ORDER BY
                             $result = $stmt->get_result();
                             $row = $result->fetch_assoc();
                             echo $row['total_hotel'];
+                            $stmt->close(); // Tutup stmt
                             ?>
                         </span>
                         <span class="text-xs font-normal text-slate-400 group-hover:text-slate-500">hotels</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Card 4: Total Items -->
-                <div class="group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36">
+                <div class="group bg-white hidden p-5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-900 hover:border-slate-800 transition duration-300 flex flex-col justify-between h-36">
                     <div class="flex justify-between items-start">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-500 group-hover:text-slate-400">Total Items</span>
                         <div class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:border-slate-700 group-hover:text-sky-400 transition duration-300">
@@ -222,9 +198,9 @@ ORDER BY
                     </div>
 
                     <div class="space-y-3 max-h-[260px] overflow-y-auto pr-1">
-                        <?php while ($row = $jobsheetResult->fetch_assoc()): 
+                        <?php while ($row = $jobsheetResult->fetch_assoc()):
                             $datetime1 = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
-                            $datetimeString = $row['date'] . ' ' . $row['time']; 
+                            $datetimeString = $row['date'] . ' ' . $row['time'];
                             $datetime2 = DateTime::createFromFormat('d F Y h:i A', $datetimeString, new DateTimeZone('Asia/Kuala_Lumpur'));
 
                             $time = 'just now';
@@ -237,7 +213,7 @@ ORDER BY
 
                             $task_type = strtolower($row['task_type']);
                             $is_install = ($task_type == "installation");
-                            
+
                             $icon_class = $is_install ? "fa-wrench text-emerald-500" : "fa-cog text-amber-500";
                         ?>
                             <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition duration-150">
@@ -247,7 +223,7 @@ ORDER BY
                                     </div>
                                     <div>
                                         <p class="text-sm font-semibold text-slate-800 capitalize flex items-center gap-1.5">
-                                            <i class="fas <?= $icon_class ?> text-xs"></i> 
+                                            <i class="fas <?= $icon_class ?> text-xs"></i>
                                             <?= htmlspecialchars($task_type) ?> at <span class="font-bold text-slate-900"><?= htmlspecialchars($row["hotel_name"]) ?></span>
                                         </p>
                                         <span class="text-xs text-slate-400 font-medium"><?= $time ?></span>
@@ -273,7 +249,7 @@ ORDER BY
                     <canvas id="jobsheetChart" class="max-h-[320px]"></canvas>
                 </div>
             </div>
-            
+
             <!-- System Status Sidebar -->
             <div class="lg:col-span-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div>
@@ -346,28 +322,32 @@ ORDER BY
             document.getElementById('jobsheetDetailsModal').classList.add('hidden');
         }
 
-        $(document).ready(function () {
-            $('.view-details-btn').on('click', function () {
+        $(document).ready(function() {
+            $('.view-details-btn').on('click', function() {
                 const jobsheetId = $(this).data('id');
                 $.ajax({
                     url: 'jobsheet/get-jobsheet-details.php',
                     type: 'POST',
-                    data: { id: jobsheetId },
-                    success: function (response) {
+                    data: {
+                        id: jobsheetId
+                    },
+                    success: function(response) {
                         $('#jobsheetDetailsBody').html(response);
                         document.getElementById('jobsheetDetailsModal').classList.remove('hidden');
                     }
                 });
             });
 
-            $('.delete-jobsheet-btn').on('click', function () {
+            $('.delete-jobsheet-btn').on('click', function() {
                 const id = $(this).data('id');
                 if (confirm('Are you sure you want to delete this jobsheet?')) {
                     $.ajax({
                         url: 'jobsheet/jobsheet-delete.php',
                         type: 'POST',
-                        data: { id: id },
-                        success: function (response) {
+                        data: {
+                            id: id
+                        },
+                        success: function(response) {
                             if (response.trim() === 'success') {
                                 location.reload();
                             } else {
@@ -404,10 +384,23 @@ ORDER BY
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
                         scales: {
-                            y: { grid: { color: '#f1f5f9' }, beginAtZero: true },
-                            x: { grid: { display: false } }
+                            y: {
+                                grid: {
+                                    color: '#f1f5f9'
+                                },
+                                beginAtZero: true
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
                         }
                     }
                 });

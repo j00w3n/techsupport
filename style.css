@@ -41,3 +41,27 @@ nav ol {
 .text-grey {
     color: #a9acaf !important;
 }
+    /* Sembunyikan horizontal scrollbar untuk keseluruhan page */
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Rekaan scrollbar menegak yang lebih halus (Custom Scrollbar) */
+    ::-webkit-scrollbar {
+        width: 6px; /* Nipiskan scrollbar tepi */
+        height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f5f9; /* Warna slate-100 (ikut warna background bodi) */
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1; /* Warna slate-300 */
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8; /* Warna slate-400 bila hover */
+    }

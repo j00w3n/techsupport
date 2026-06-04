@@ -2,88 +2,95 @@
 include '../db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Step 1: Get basic form values
-    $date = $_POST['date'];
-    $time = $_POST['time'];
-    $hotel_id = $_POST['hotelname'];
-    $typetask = $_POST['task'];
-    $person_id = $_POST['pic'];
-    $complaint = $_POST['description'];
-    $picemail = $_POST['picemail'];
-    $new_staff_name = $_POST['newstaff'];
+    // Step 1: Dapatkan nilai asas dari form input
+    $date      = $_POST['date'];
+    $time      = $_POST['time'];
+    $hotel_id  = intval($_POST['hotelname']);
+    $typetask  = $_POST['task'];
+    $pic_email = $_POST['picemail'] ?? '';
 
-    // ✅ Step 1.1: Check if the selected person's email needs update
-    $stmtCheck = $conn->prepare("SELECT email FROM hotel_person WHERE picid = ?");
-    $stmtCheck->bind_param("i", $person_id);
-    $stmtCheck->execute();
-    $stmtCheck->bind_result($current_email);
-    $stmtCheck->fetch();
-    $stmtCheck->close();
+    // Nama PIC diambil terus dari input 'newstaff'
+    $pic_name  = $_POST['newstaff'] ?? '';
+    $description = $_POST['description'] ?? '';
 
-    if ($current_email !== $picemail && !empty($picemail)) {
-        $stmtUpdate = $conn->prepare("UPDATE hotel_person SET email = ? WHERE picid = ?");
-        $stmtUpdate->bind_param("si", $picemail, $person_id);
-        $stmtUpdate->execute();
-        $stmtUpdate->close();
+    // 🌟 LOGIK BARU: Tarik hotelEmail secara automatik dari table hotel berdasarkan hotel_id
+    $pic_email = "";
+    if ($hotel_id > 0) {
+        $stmtHotel = $conn->prepare("SELECT email FROM hotel WHERE id = ?");
+        $stmtHotel->bind_param("i", $hotel_id);
+        $stmtHotel->execute();
+        $stmtHotel->bind_result($fetched_email);
+        if ($stmtHotel->fetch()) {
+            $pic_email = $fetched_email; // Email hotel kini menjadi pic_email secara automatik
+        }
+        $stmtHotel->close();
     }
+    // 🌟 LOGIK BARU: Proses Tanda Tangan Canvas
+    $signature_filename = NULL;
+    if (!empty($_POST['signature_image'])) {
+        $img_data = $_POST['signature_image'];
 
-    // 1. Get values
-    $new_staff_name = trim($_POST['newstaff']);
-    $picemail = $_POST['picemail'];
-    $person_id = $_POST['pic']; // Might be empty if new staff
+        // Potong header Base64 ("data:image/png;base64,") untuk ambil data mentah gambar
+        $filteredData = explode(',', $img_data);
+        if (isset($filteredData[1])) {
+            $unencodedData = base64_decode($filteredData[1]);
 
-    // 2. If new staff name is filled and person_id is empty, insert new person
-    if (!empty($new_staff_name) && empty($person_id)) {
-        $stmtNew = $conn->prepare("INSERT INTO hotel_person (picname, email, hotel_id) VALUES (?, ?, ?)");
-        $stmtNew->bind_param("ssi", $new_staff_name, $picemail, $hotel_id);
-        $stmtNew->execute();
-        $person_id = $stmtNew->insert_id; // Now this is the person to use
-        $stmtNew->close();
+            // Reka nama fail unik (contoh: sig_67f8a9bc.png)
+            $signature_filename = "sig_" . uniqid() . ".png";
+
+            // Simpan fail fizikal ke dalam folder 'signatures/'
+            // Menggunakan ../signatures/ jika fail submit ini berada di dalam subfolder (cth: hotel/)
+            file_put_contents("../signatures/" . $signature_filename, $unencodedData);
+        }
     }
+    // Step 2: Dapatkan array barang yang digunakan
+    $items      = isset($_POST['item']) ? $_POST['item'] : [];
+    $quantities = isset($_POST['quantity']) ? $_POST['quantity'] : [];
 
-
-    // Step 2: Get item arrays
-    $items = $_POST['item'];        // [item_id1, item_id2, ...]
-    $quantities = $_POST['quantity']; // [qty1, qty2, ...]
-
-
-    // Step 3: Insert into jobsheet
+    // Step 3: Insert rekod ke dalam table jobsheet
     $stmt = $conn->prepare("INSERT INTO jobsheet 
-        (date, time, hotel_id, task_type, person_id, complaint, fault) 
-        VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssss", $date, $time, $hotel_id, $typetask, $person_id, $complaint);
+        (date, time, description,hotel_id, task_type, pic_name, pic_email, signature_path) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+    // 8 parameter diikat dengan tepat ke dalam table jobsheet
+    $stmt->bind_param("sssissss", $date, $time, $description, $hotel_id, $typetask, $pic_name, $pic_email, $signature_filename);
     if ($stmt->execute()) {
         $jobsheet_id = $stmt->insert_id;
         $stmt->close();
 
-        // Step 4: Insert item rows and update inventory
-        $itemStmt = $conn->prepare("INSERT INTO jobsheet_items (jobsheet_id, item_id, quantity) VALUES (?, ?, ?)");
-        if ($typetask === 'Installation') {
-            $stockStmt = $conn->prepare("UPDATE inventory SET stock_quantity = stock_quantity - ? WHERE item_id = ?");
-        } else {
-            $stockStmt = $conn->prepare("UPDATE inventory SET stock_quantity = stock_quantity + ? WHERE item_id = ?");
-        }
-        foreach ($items as $index => $item_id) {
-            $qty = intval($quantities[$index]);
-            if (!empty($item_id) && $qty > 0) {
-                // insert into jobsheet_items
-                $itemStmt->bind_param("iii", $jobsheet_id, $item_id, $qty);
-                $itemStmt->execute();
+        // Step 4: Uruskan kemasukan barang (jobsheet_items) & Kemas kini Inventori
+        if (!empty($items)) {
+            $itemStmt = $conn->prepare("INSERT INTO jobsheet_items (jobsheet_id, item_id, quantity) VALUES (?, ?, ?)");
 
-                // deduct stock
-                $stockStmt->bind_param("ii", $qty, $item_id);
-                $stockStmt->execute();
+            if (strtolower($typetask) === 'installation') {
+                $stockStmt = $conn->prepare("UPDATE inventory SET stock_quantity = stock_quantity - ? WHERE item_id = ?");
+            } else {
+                $stockStmt = $conn->prepare("UPDATE inventory SET stock_quantity = stock_quantity + ? WHERE item_id = ?");
             }
+
+            foreach ($items as $index => $item_id) {
+                if (isset($quantities[$index])) {
+                    $qty = intval($quantities[$index]);
+
+                    if (!empty($item_id) && $qty > 0) {
+                        $itemStmt->bind_param("iii", $jobsheet_id, $item_id, $qty);
+                        $itemStmt->execute();
+
+                        $stockStmt->bind_param("ii", $qty, $item_id);
+                        $stockStmt->execute();
+                    }
+                }
+            }
+            $itemStmt->close();
+            $stockStmt->close();
         }
-        $itemStmt->close();
-        $stockStmt->close();
+
         $conn->close();
 
-        // Success
+        // Sukses & Hantar balik ke Dashboard
         header("Location: ../dashboard.php?success=1");
         exit();
     } else {
         echo "❌ Failed to insert jobsheet: " . $stmt->error;
     }
 }
-?>

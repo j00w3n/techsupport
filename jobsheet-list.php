@@ -1,19 +1,18 @@
 <?php
 include 'db.php';
 
-// 1. Tarik senarai hotel untuk drop-down filter
+// 1. Tarik senarai hotel untuk drop-down filter (Kekalkan)
 $hotelsQuery = $conn->query("SELECT * FROM hotel ORDER BY name ASC");
 
-// 2. Ambil data filter dari URL params
+// 2. Ambil data filter dari URL params (Kekalkan)
 $filterHotel = isset($_GET['hotel_id']) ? $_GET['hotel_id'] : '';
 $filterTask  = isset($_GET['task_type']) ? $_GET['task_type'] : '';
 $filterDate  = isset($_GET['date']) ? $_GET['date'] : '';
 
-// 3. Bina Query SQL dinamik berdasarkan filter
-$sql = "SELECT j.*, h.name AS hotel_name, p.picname AS person_name 
+// 3. 🌟 QUERY BARU: Buang JOIN hotel_person, ambil terus pic_name dari jobsheet
+$sql = "SELECT j.*, h.name AS hotel_name 
         FROM jobsheet j
         JOIN hotel h ON j.hotel_id = h.id
-        LEFT JOIN hotel_person p ON j.person_id = p.picid
         WHERE 1=1";
 
 if ($filterHotel != '') {
@@ -26,15 +25,16 @@ if ($filterDate != '') {
     $sql .= " AND j.date = '" . $conn->real_escape_string($filterDate) . "'";
 }
 
+// Susun ikut tarikh dan masa terbaru
 $sql .= " ORDER BY j.date DESC, j.time DESC";
 $jobsheetResult = $conn->query($sql);
 
-// === JANTUNG PENYELAMAT: Sini kita wajib isytihar & isi array ===
-$jobsheetsArray = []; // Kita paksa dia jadi array kosong dulu, jadi count() takkan error null
+$jobsheetsArray = [];
 
+// 4. Sedut data masuk ke dalam array untuk diagihkan ke Timeline & List bawah
 if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
     while ($row = $jobsheetResult->fetch_assoc()) {
-        $jobsheetsArray[] = $row; // Sumbat data masuk sini
+        $jobsheetsArray[] = $row;
     }
 }
 ?>
@@ -48,6 +48,7 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="bg-slate-100 text-slate-800 font-sans antialiased overflow-x-hidden">
@@ -75,7 +76,7 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
                 <i class="fas fa-stream text-sky-500"></i> Operation Logs & Chronology
             </h1>
             <a href="index.php" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm transition">
-                <i class="fa-solid fa-plus mr-1"></i> Form Console
+                <i class="fa-solid fa-plus mr-1"></i> Form
             </a>
         </div>
 
@@ -121,13 +122,23 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
 
             <div class="lg:col-span-1">
                 <div class="bg-slate-900 text-white p-4 rounded-xl border border-slate-800 shadow-md space-y-4">
-                    <div class="border-b border-slate-800 pb-2">
-                        <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
-                            <i class="fas fa-history text-sky-400"></i> Operational Chronology
-                        </h3>
-                        <p class="text-[10px] text-slate-500 mt-1">
-                            <?= ($filterHotel != '') ? 'Showing stream log sequence for this hotel.' : 'Lineage tracking maps.' ?>
-                        </p>
+                    <div class="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+                                <i class="fas fa-history text-sky-400"></i> Operational Chronology
+                            </h3>
+                            <p class="text-[10px] text-slate-500 mt-1">
+                                <?= ($filterHotel != '') ? 'Showing technical troubleshooting timeline for the selected hotel.' : 'Hotel-specific technical timeline.' ?>
+                            </p>
+                        </div>
+
+                        <?php if ($filterHotel != ''): ?>
+                            <div>
+                                <a href="generate-chronology-pdf.php?hotel_id=<?= $filterHotel ?>" target="_blank" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-lg transition shadow-sm">
+                                    <i class="fas fa-file-pdf"></i> Export Chronology
+                                </a>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <?php if ($filterHotel != ''): ?>
@@ -207,9 +218,14 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
                                     <button class="view-btn p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition" data-id="<?= $row['id'] ?>" title="Quick View">
                                         <i class="fas fa-eye text-xs"></i>
                                     </button>
-                                    <a href="generatepdf.php?id=<?= $row['id'] ?>" target="_blank" class="p-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg transition" title="Print PDF Invoices">
+
+                                    <a href="generatepdf.php?id=<?= $row['id'] ?>" target="_blank" class="p-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg transition" title="Print PDF">
                                         <i class="fas fa-file-pdf text-xs"></i>
                                     </a>
+
+                                    <button class="delete-jobsheet-btn p-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg transition" data-id="<?= $row['id'] ?>" title="Delete Jobsheet">
+                                        <i class="fas fa-trash-alt text-xs"></i>
+                                    </button>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -230,7 +246,7 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
         }
 
         $(document).ready(function() {
-            // Bind view action matching dashboard ajax pipeline
+            // 1. Skrip asal untuk View Details (Kekalkan)
             $('.view-btn').on('click', function() {
                 const id = $(this).data('id');
                 $.ajax({
@@ -244,6 +260,36 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
                         document.getElementById('detailsModal').classList.remove('hidden');
                     }
                 });
+            });
+
+            // 2. SKRIP BARU: Pengendali Butang Delete Jobsheet
+            $('.delete-jobsheet-btn').on('click', function() {
+                const id = $(this).data('id');
+
+                // Letak confirmation prompt supaya tak tersilap tekan
+                if (confirm('Are you sure you want to delete this jobsheet? This action cannot be undone.')) {
+                    $.ajax({
+                        url: 'jobsheet/jobsheet-delete.php',
+                        type: 'POST',
+                        data: {
+                            id: id
+                        },
+                        success: function(response) {
+                            // Semak jika backend pulangkan text 'success'
+                            if (response.trim() === 'success') {
+                                alert('✅ Jobsheet deleted successfully.');
+                                location.reload(); // Refresh page untuk update senarai terkini
+                            } else {
+                                alert('❌ Failed to delete jobsheet. System error.');
+                                console.log('Response:', response);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('❌ Connection failed to process delete request.');
+                            console.log('Error:', error);
+                        }
+                    });
+                }
             });
         });
     </script>

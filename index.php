@@ -47,7 +47,7 @@
                             $stmt->execute();
                             $result = $stmt->get_result();
                             while ($row = $result->fetch_assoc()) {
-                                echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                                echo "<option value='" . $row['id'] . "' data-email='" . $row['email'] . "'>" . $row['name'] . "</option>";
                             }
                             ?>
                         </select>
@@ -70,16 +70,12 @@
 
                 <div id="section-troubleshoot" class="space-y-4 border-t border-slate-200 pt-4">
                     <div>
-                        <label for="complaint" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Complaint</label>
-                        <textarea id="complaint" name="complaint" rows="3" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150" placeholder="Describe client's issue..."></textarea>
-                    </div>
-                    <div>
-                        <label for="fault" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Description of Fault</label>
-                        <textarea id="fault" name="fault" rows="3" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150" placeholder="What actually broke down?"></textarea>
+                        <label for="description" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">DESCRIPTION</label>
+                        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150" placeholder="Describe client's issue..."></textarea>
                     </div>
                 </div>
 
-                <div class="border-t border-slate-200 pt-4">
+                <div class="border-t border-slate-200 pt-4 hidden" id="section-installation">
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Items Used / Updated</label>
                     <div id="item-container" class="space-y-3">
                         <div class="flex gap-2 item-row items-center">
@@ -122,33 +118,88 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="pic" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Person In Charge</label>
-                            <select id="pic" name="pic" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150">
-                                <option value="" selected>Select person</option>
-                            </select>
+                            <label for="newstaff" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Person In Charge (PIC)</label>
+                            <input type="text" id="newstaff" name="newstaff" required
+                                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150 text-slate-800"
+                                placeholder="Enter PIC name (e.g. Haziq)">
                         </div>
+
                         <div>
-                            <label for="newstaff" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">New Staff / Representative</label>
-                            <input type="text" id="newstaff" name="newstaff" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150" placeholder="If PIC not listed...">
+                            <label for="picemail" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Email Address</label>
+                            <input type="email" id="picemail" name="picemail" readonly
+                                class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm text-slate-500 focus:outline-none"
+                                placeholder="hotel@email.com">
                         </div>
                     </div>
 
                     <div class="mt-4">
-                        <label for="picemail" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Email Address</label>
-                        <input type="email" id="picemail" name="picemail" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm text-slate-500 focus:outline-none" placeholder="pic@hotel.com" readonly>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Client Signature</label>
+                        <div class="border border-slate-300 rounded-md bg-white shadow-sm overflow-hidden">
+                            <canvas id="signature-pad" class="w-full h-48 block bg-slate-50"></canvas>
+                        </div>
+                        <input type="hidden" id="signature_data" name="signature_image">
                     </div>
-                </div>
 
-                <div class="pt-4">
-                    <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-150 uppercase tracking-wider text-sm">
-                        <i class="fas fa-paper-plane mr-2"></i> Submit Jobsheet
-                    </button>
+                    <div class="pt-4">
+                        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-150 uppercase tracking-wider text-sm flex items-center justify-center">
+                            <i class="fas fa-paper-plane mr-2"></i> Submit Jobsheet
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@5.1/dist/signature_pad.umd.min.js" integrity="sha256-DYq7w7p8ljuA7cpV0a7QQ4O2GU6atSHKl3qDL5sNxcQ=" crossorigin="anonymous"></script>
+    <script>
+        const canvas = document.querySelector("canvas");
+
+        const signaturePad = new SignaturePad(canvas);
+
+        signaturePad.toDataURL();
+        signaturePad.toDataURL("image/jpeg");
+        signaturePad.toDataURL("image/jpeg", 0.5);
+        signaturePad.toDataURL("image/svg+xml");
+        signaturePad.toSVG();
+        signaturePad.toSVG({
+            includeBackgroundColor: true
+        });
+        signaturePad.toSVG({
+            includeDataUrl: true
+        });
+        signaturePad.fromDataURL("data:image/png;base64,iVBORw0K...");
+        signaturePad.fromDataURL("data:image/png;base64,iVBORw0K...", {
+            ratio: 1,
+            width: 400,
+            height: 200,
+            xOffset: 100,
+            yOffset: 50
+        });
+
+        const data = signaturePad.toData();
+
+        signaturePad.fromData(data);
+
+        signaturePad.fromData(data, {
+            clear: false
+        });
+
+        // Redraw the canvas
+        signaturePad.redraw();
+
+        // Clears the canvas
+        signaturePad.clear();
+
+        // Returns true if canvas is empty, otherwise returns false
+        signaturePad.isEmpty();
+
+        // Unbinds all event handlers
+        signaturePad.off();
+
+        // Rebinds all event handlers
+        signaturePad.on();
+    </script>
     <script>
         // Add item row dynamic cloning
         document.getElementById('addItem').addEventListener('click', function() {
@@ -168,27 +219,25 @@
                 }
             }
         });
-
-        // AJAX Handle for Hotel PIC
-        document.getElementById('pic').addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const email = selectedOption.getAttribute('data-email');
-            const picEmailInput = document.getElementById('picemail');
-            picEmailInput.value = email || '';
+        // Contoh jika kau guna SignaturePad library atau Javascript biasa masa hantar form:
+        $('form').on('submit', function(e) {
+            const canvas = document.getElementById('signature-pad');
+            const dataURL = canvas.toDataURL('image/png');
+            $('#signature_data').val(dataURL);
         });
+        $(document).ready(function() {
 
-        $('#hotelname').on('change', function() {
-            var hotelId = $(this).val();
-            $.ajax({
-                url: 'pic/get_hotel_person.php',
-                type: 'POST',
-                data: {
-                    hotel_id: hotelId
-                },
-                success: function(data) {
-                    $('#pic').html(data);
+            // Bila drop-down hotel ditukar (change event)
+            $('#hotelname').on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                const hotelEmail = selectedOption.data('email');
+                if (hotelEmail) {
+                    $('#picemail').val(hotelEmail);
+                } else {
+                    $('#picemail').val('');
                 }
             });
+
         });
     </script>
 </body>
