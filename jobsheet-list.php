@@ -44,7 +44,7 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIVTech Support - Jobsheet Master & History</title>
+    <title>VIVTech Support - Jobsheets Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" crossorigin="anonymous"></script>
@@ -59,7 +59,7 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
         <div class="bg-white rounded-xl shadow-xl border border-slate-200 max-w-2xl w-full overflow-hidden transform transition-all">
             <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800">
                 <h5 class="text-md font-bold text-white uppercase tracking-wider">
-                    <i class="fas fa-info-circle text-sky-500 mr-2"></i>Job Logistics
+                    <i class="fas fa-info-circle text-sky-500 mr-2"></i>Jobsheet Details
                 </h5>
                 <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-white transition">
                     <i class="fas fa-times text-lg"></i>
@@ -72,11 +72,19 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm gap-4">
-            <h1 class="text-lg font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                <i class="fas fa-stream text-sky-500"></i> Operation Logs & Chronology
-            </h1>
-            <a href="index.php" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm transition">
-                <i class="fa-solid fa-plus mr-1"></i> Form
+            <nav class="text-sm font-medium text-slate-500">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="index.php" class="text-slate-600 hover:text-sky-600 transition"><i class="fas fa-home mr-2"></i>Home</a>
+                    </li>
+                    <li class="flex items-center text-slate-400">
+                        <i class="fas fa-chevron-right text-xs mx-2"></i>
+                        <span class="text-slate-400">Jobsheets Management</span>
+                    </li>
+                </ol>
+            </nav>
+            <a href="index.php" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm transition">
+                <i class="fa-solid fa-pen"></i> Jobsheet Form
             </a>
         </div>
 
@@ -206,6 +214,8 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
                                         <i class="far fa-clock mr-1"></i> <?= htmlspecialchars($row['time']) ?>
                                         <span class="mx-1.5 text-slate-300">•</span>
                                         <i class="far fa-user mr-1"></i> PIC: <?= htmlspecialchars($row['person_name'] ?? 'N/A') ?>
+                                        <span class="mx-1.5 text-slate-300">•</span>
+                                        <i class="far fa-user mr-1"></i> Signature: <?= htmlspecialchars($row['signature_path'] ?? 'N/A') ?>
                                     </p>
                                     <?php if (!empty($row['complaint'])): ?>
                                         <p class="text-xs text-slate-600 line-clamp-1 italic bg-slate-50 p-2 rounded border border-slate-100 font-mono">

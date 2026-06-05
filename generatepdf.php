@@ -1,12 +1,22 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require 'libs/fpdf/fpdf.php';
 include 'db.php';
 
 if (isset($_GET['id'])) {
-    $jobsheet_id = intval($_GET['id']); // Letak intval untuk keselamatan daripada SQL injection
+    $jobsheet_id = intval($_GET['id']);
 
-    // 1. QUERY: Ambil semua data asas termasuk signature_path terus dari table jobsheet
-    $stmt = $conn->prepare("SELECT j.*, 
+    // 🌟 KEMAS KINI MUKTAMAD: Beri nama Alias 'jobsheet_real_id' supaya tak gaduh dengan ID Hotel
+    $stmt = $conn->prepare("SELECT j.id AS jobsheet_real_id,
+                                   j.hotel_id,
+                                   j.task_type,
+                                   j.pic_name,
+                                   j.pic_email,
+                                   j.description,
+                                   j.signature_path, -- 🌟 Paksa ambil column path tanda tangan
                                    DATE_FORMAT(j.date, '%d %M %Y') AS formatted_date, 
                                    TIME_FORMAT(j.time, '%H:%i %p') AS formatted_time, 
                                    h.name AS hotel_name
@@ -23,31 +33,15 @@ if (isset($_GET['id'])) {
         die("❌ Error: Jobsheet record not found.");
     }
 
-    // 2. Tarik senarai barang yang digunakan
-    $items = [];
-    $stmt2 = $conn->prepare("SELECT i.name, ji.quantity
-                             FROM jobsheet_items ji
-                             JOIN items i ON ji.item_id = i.id
-                             WHERE ji.jobsheet_id = ?");
-    $stmt2->bind_param("i", $jobsheet_id);
-    $stmt2->execute();
-    $itemsResult = $stmt2->get_result();
-    while ($item = $itemsResult->fetch_assoc()) {
-        $items[] = $item;
-    }
-    $stmt2->close();
-
-    $bluecolor = array(0, 71, 171);
-
-    // 3. Mula Generate PDF
+    // Mula buat PDF
     $pdf = new FPDF();
     $pdf->AddPage();
     $pdf->SetFont('Arial', 'B', 14);
 
-    // Header Syarikat & Logo
+    // Header Syarikat
     $pdf->Image('viv_logo.png', 10, 6, 30);
     $pdf->SetFont('Arial', '', 8);
-    $pdf->Cell(0, 0, 'Daytime Sdn Bhd (74432-U)', 0, 1, 'R');
+    $pdf->Cell(0, 0, 'VISION FOUR MULTIMEDIA SDN BHD (199501037071)', 0, 1, 'R');
     $pdf->SetXY(50, 14);
     $pdf->Cell(0, 0, '28, Jalan Liku, Bangsar,', 0, 1, 'R');
     $pdf->SetXY(50, 18);
@@ -61,15 +55,25 @@ if (isset($_GET['id'])) {
     $pdf->SetTextColor(0, 71, 171);
     $pdf->Cell(0, 10, 'Jobsheet Report', 0, 1, 'C');
 
-    $pdf->SetFont('Arial', '', 12);
+    $pdf->SetFont('Arial', '', 11);
     $pdf->Ln(5);
     $pdf->SetTextColor(0, 71, 171);
-
-    // Maklumat Blok Kiri & Kanan (Hotel, Tarikh, Masa)
+    $real_id = $row['jobsheet_real_id'] ?? $jobsheet_id;
+    $twodigityear = date('y');
+    $running_number = str_pad($real_id, 3, '0', STR_PAD_LEFT);
+    $jobsheet_ref = $twodigityear . $running_number;
+    // Grid Hotel & Tarikh
     $pdf->Cell(0, 10, 'Hotel:', 0, 0);
     $pdf->SetTextColor(0, 0, 0);
     $pdf->SetXY(30, 47);
     $pdf->Cell(0, 10, $row['hotel_name'], 0, 1);
+    $pdf->SetTextColor(220, 38, 38);
+
+    $pdf->SetXY(150, 37);
+    $pdf->Cell(0, 10, 'ID:', 0, 0);
+    $pdf->SetXY(165, 37);
+    $pdf->SetTextColor(220, 38, 38);
+    $pdf->Cell(0, 10, $jobsheet_ref, 0, 1);
     $pdf->SetTextColor(0, 71, 171);
 
     $pdf->SetXY(150, 47);
@@ -84,74 +88,99 @@ if (isset($_GET['id'])) {
     $pdf->SetXY(165, 57);
     $pdf->SetTextColor(0, 0, 0);
     $pdf->Cell(0, 10, $row['formatted_time'], 0, 1);
-    $pdf->SetTextColor(0, 71, 171);
 
-    // Maklumat PIC, Email, Task
+
     $pdf->Ln(10);
-    $pdf->Cell(50, 10, 'Person:', 0, 0);
+
+    $pdf->SetTextColor(0, 71, 171);
+    $pdf->Cell(50, 10, 'Person In Charge:', 0, 0);
     $pdf->SetTextColor(0, 0, 0);
     $pdf->Cell(0, 10, $row['pic_name'], 0, 1);
-    $pdf->SetTextColor(0, 71, 171);
 
+    $pdf->SetTextColor(0, 71, 171);
     $pdf->Cell(50, 10, 'Email:', 0, 0);
     $pdf->SetTextColor(0, 0, 0);
     $pdf->Cell(0, 10, $row['pic_email'], 0, 1);
-    $pdf->SetTextColor(0, 71, 171);
 
+    $pdf->SetTextColor(0, 71, 171);
     $pdf->Cell(50, 10, 'Task:', 0, 0);
     $pdf->SetTextColor(0, 0, 0);
     $pdf->MultiCell(0, 10, $row['task_type']);
-    $pdf->SetTextColor(0, 71, 171);
 
-    $pdf->Cell(50, 10, 'Description:', 0, 0);
+    $pdf->SetTextColor(0, 71, 171);
+    $pdf->Cell(50, 6, 'Description:', 0, 0); // Tukar tinggi cell tajuk jadi 6 juga biar sebaris
     $pdf->SetTextColor(0, 0, 0);
-    // 🌟 FIX BUG: Tukar dari $row['description'] kepada $row['complaint'] ikut column DB yang betul
-    $pdf->MultiCell(0, 10, !empty($row['description']) ? $row['description'] : 'No description provided.');
-    $pdf->SetTextColor(0, 71, 171);
+    $pdf->MultiCell(0, 6, !empty($row['description']) ? $row['description'] : 'No description provided.');
 
-    // 4. Paparkan Senarai Barang Guna (Aktifkan balik bahagian yang kau komen tadi)
-    $pdf->Ln(5);
-    $pdf->SetFont('Arial', 'B', 12);
-    $pdf->Cell(0, 10, 'Items Used:', 0, 1);
+    // =================================================================
+    // 🌟 KOD MUKTAMAD: LOCK 2 KOLUM DI BAWAH (KIRI: CLIENT, KANAN: TECHNICIAN)
+    // =================================================================
 
-    $pdf->SetFont('Arial', '', 12);
-    if (!empty($items)) {
-        foreach ($items as $item) {
-            $pdf->Cell(0, 10, "- {$item['name']} (x{$item['quantity']})", 0, 1);
-        }
-    } else {
-        $pdf->SetTextColor(120, 120, 120);
-        $pdf->Cell(0, 10, "No inventory items deployed for this task.", 0, 1);
-        $pdf->SetTextColor(0, 0, 0);
-    }
+    // 1. ANCHOR: Paksa kursor melompat ke 60mm sebelum kertas habis
+    $pdf->SetY(220);
+    $current_y_anchor = $pdf->GetY(); // Simpan titik Y ini untuk rujukan kedua-dua kolum
 
-    // 5. 🌟 LOGIK BARU: Cetak Gambar Tanda Tangan dari Canvas Form
-    $pdf->Ln(10);
+    // -----------------------------------------------------------------
+    // KOLUM KIRI: CLIENT ACKNOWLEDGEMENT (Kekalkan paksi-X asal = 15)
+    // -----------------------------------------------------------------
+    $pdf->SetX(15);
     $pdf->SetFont('Arial', 'B', 12);
     $pdf->SetTextColor(0, 71, 171);
-    $pdf->Cell(0, 10, 'Client Acknowledgement:', 0, 1);
+    $pdf->Cell(95, 8, 'Client Acknowledgement:', 0, 0); // Lebar 95mm (Separuh kertas)
 
-    // Semak kalau fail signature wujud dalam folder signatures/
-    if (!empty($row['signature_path']) && file_exists("signatures/" . $row['signature_path'])) {
-        $current_x = $pdf->GetX();
-        $current_y = $pdf->GetY();
+    // Ambil koordinat untuk imej signature pelanggan
+    $client_x = 15;
+    $client_y = $current_y_anchor + 8;
 
-        // Cetak gambar tanda tangan (.png) secara dinamik
-        $pdf->Image("signatures/sig_6a21434a0ab62.png", $current_x, $current_y, 45, 22, 'PNG');
-        $pdf->Ln(24); // Bagi ruang ke bawah supaya nama tak bertindih dengan imej
+    $sig_file = $row['signature_path'] ?? '';
+    $absolute_path = __DIR__ . '/signatures/' . $sig_file;
+
+    if (!empty($sig_file) && file_exists($absolute_path)) {
+        // Tembak imej signature di sebelah kiri
+        $pdf->Image($absolute_path, $client_x, $client_y, 45, 22, 'PNG');
     } else {
         $pdf->SetFont('Arial', 'I', 10);
         $pdf->SetTextColor(150, 150, 150);
-        $pdf->Cell(0, 10, '(No digital signature captured)', 0, 1);
-        $pdf->Ln(5);
+        // Letak Textbox amaran sementara di koordinat kiri
+        $pdf->SetXY($client_x, $client_y);
+        $pdf->Cell(95, 22, '(No signature captured)', 0, 0);
     }
 
-    // Garisan Nama Pengesiah Atas Tanda Tangan
+    // Gerakkan kursor ke bawah imej untuk cetak Garisan & Nama Client
+    $pdf->SetXY(15, $current_y_anchor + 32);
     $pdf->SetFont('Arial', '', 11);
     $pdf->SetTextColor(0, 0, 0);
-    $pdf->Cell(60, 5, '__________________________', 0, 1);
-    $pdf->Cell(60, 7, 'Name: ' . ($row['pic_name'] ?? 'N/A'), 0, 1);
+    $pdf->Cell(95, 5, '__________________________', 0, 1);
+    $pdf->SetX(15);
+    $pdf->Cell(95, 15, 'Name: ' . ($row['pic_name'] ?? 'N/A'), 0, 0);
 
-    // Output PDF ke Browser
+
+    // -----------------------------------------------------------------
+    // KOLUM KANAN: ATTENDED TECHNICIAN (Kita anjak paksi-X ke = 115)
+    // -----------------------------------------------------------------
+    $pdf->SetXY(135, $current_y_anchor); // Lompat balik ke Y atas, tapi X di kanan
+    $pdf->SetFont('Arial', 'B', 12);
+    $pdf->SetTextColor(0, 71, 171);
+    $pdf->Cell(80, 8, 'Attended VIVTechnician:', 0, 1);
+
+    // Memandangkan tak perlu signature, kita terus buat kotak info / jarak kosong yang kemas
+    $pdf->SetX(135);
+    $pdf->Ln(2); // Bagi gap sikit ke bawah
+
+    // Cetak Nama Juruteknik / Staff yang login / handle task tersebut
+    // (Nota: Sila ganti $row['staff_name'] ikut nama column staff/technician kau yang sebenar)
+    $technician_name = $row['technician_name'] ?? 'Duty Technician';
+    $pdf->Image('signatures/sig_vivtech.png', 135, $current_y_anchor + 8, 45, 22, 'PNG'); // Logo teknisyen di kanan
+    $pdf->SetXY(135, $current_y_anchor + 32); // Sebariskan ketinggian teks nama dengan sebelah kiri
+    $pdf->SetFont('Arial', '', 11);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell(80, 5, '__________________________', 0, 1);
+    $pdf->SetX(135);
+    $pdf->Cell(95, 15, 'Name: ' . $technician_name, 0, 0);
+
+    // =================================================================
+    // END OF PDF OUTPUT
+    // =================================================================
+    if (ob_get_contents()) ob_end_clean();
     $pdf->Output('I', 'js_' . str_replace(' ', '_', $row['hotel_name']) . '_' . $row['formatted_date'] . '.pdf');
 }

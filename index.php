@@ -55,7 +55,7 @@
 
                     <div>
                         <span class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-3">Type of Task</span>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="task_type">
                             <?php
                             $tasks = ['troubleshoot' => 'Troubleshoot', 'installation' => 'Installation', 'dismantle' => 'Dismantle', 'maintanance' => 'Maintenance'];
                             foreach ($tasks as $value => $label): ?>
@@ -71,7 +71,7 @@
                 <div id="section-troubleshoot" class="space-y-4 border-t border-slate-200 pt-4">
                     <div>
                         <label for="description" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">DESCRIPTION</label>
-                        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150" placeholder="Describe client's issue..."></textarea>
+                        <textarea id="description" name="description" rows="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150" placeholder="Describe client's issue..."></textarea>
                     </div>
                 </div>
 
@@ -153,52 +153,57 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@5.1/dist/signature_pad.umd.min.js" integrity="sha256-DYq7w7p8ljuA7cpV0a7QQ4O2GU6atSHKl3qDL5sNxcQ=" crossorigin="anonymous"></script>
     <script>
-        const canvas = document.querySelector("canvas");
+        const canvas = document.getElementById('signature-pad');
 
-        const signaturePad = new SignaturePad(canvas);
-
-        signaturePad.toDataURL();
-        signaturePad.toDataURL("image/jpeg");
-        signaturePad.toDataURL("image/jpeg", 0.5);
-        signaturePad.toDataURL("image/svg+xml");
-        signaturePad.toSVG();
-        signaturePad.toSVG({
-            includeBackgroundColor: true
+        const signaturePad = new SignaturePad(canvas, {
+            backgroundColor: 'rgb(255, 255, 255)', 
+            penColor: 'rgb(0, 0, 0)' 
         });
-        signaturePad.toSVG({
-            includeDataUrl: true
+        $('form').on('submit', function(e) {
+
+            if (signaturePad.isEmpty()) {
+                alert("Please provide a client signature before submitting.");
+                e.preventDefault();
+                return false;
+            }
+            const dataURL = signaturePad.toDataURL('image/png');
+            $('#signature_data').val(dataURL);
         });
-        signaturePad.fromDataURL("data:image/png;base64,iVBORw0K...");
-        signaturePad.fromDataURL("data:image/png;base64,iVBORw0K...", {
-            ratio: 1,
-            width: 400,
-            height: 200,
-            xOffset: 100,
-            yOffset: 50
+        $(document).ready(function() {
+
+            // 1. Define English templates (Maintaining 'maintanance' to match your PHP value)
+            const descriptionTemplates = {
+                'troubleshoot': 'Our team conducted a thorough inspection of the system reported to be experiencing downtime/disruption. Upon detailed investigation, the root cause was identified at [PLEASE SPECIFY ROOT CAUSE]. \nCorrective actions were taken by [PLEASE SPECIFY ACTIONS TAKEN]. Final testing confirms that the system is now fully operational and running stably. \n\n All Channel running okay.',
+
+                'installation': 'The installation of new infrastructure was successfully executed at [PLEASE SPECIFY LOCATION/ROOM]. The components deployed involve [PLEASE SPECIFY EQUIPMENT]. All network configurations have been aligned according to standard specifications and are fully ready for operational use.',
+
+                'dismantle': 'Dismantling and decommissioning works of the old equipment components were carried out at [PLEASE SPECIFY LOCATION]. The hardware includes [PLEASE SPECIFY EQUIPMENT]. \n\nAll uninstalled components have been cataloged and safely stored/disposed of in accordance with standard procedures.',
+
+                'maintanance': 'Preventive maintenance was carried out on [VF28HD/VIVNEWS]. The scope of work included physical cleaning, system log reviews, and firmware updates. No critical errors were found, and the overall system performance is at its optimum level.'
+            };
+
+            // Common function to inject text into textarea
+            function updateDescription(taskValue) {
+                if (descriptionTemplates[taskValue]) {
+                    $('#description').val(descriptionTemplates[taskValue]);
+                } else {
+                    $('#description').val('');
+                }
+            }
+
+            // 2. AUTO-FILL ON FIRST LOAD: Fetch the default checked radio button (Troubleshoot)
+            const initialTask = $('input[name="task"]:checked').val();
+            if (initialTask) {
+                updateDescription(initialTask);
+            }
+
+            // 3. TRIGGER ON RADIO BUTTON CHANGE
+            $('input[name="task"]').on('change', function() {
+                const selectedTask = $(this).val();
+                updateDescription(selectedTask);
+            });
+
         });
-
-        const data = signaturePad.toData();
-
-        signaturePad.fromData(data);
-
-        signaturePad.fromData(data, {
-            clear: false
-        });
-
-        // Redraw the canvas
-        signaturePad.redraw();
-
-        // Clears the canvas
-        signaturePad.clear();
-
-        // Returns true if canvas is empty, otherwise returns false
-        signaturePad.isEmpty();
-
-        // Unbinds all event handlers
-        signaturePad.off();
-
-        // Rebinds all event handlers
-        signaturePad.on();
     </script>
     <script>
         // Add item row dynamic cloning
@@ -220,11 +225,6 @@
             }
         });
         // Contoh jika kau guna SignaturePad library atau Javascript biasa masa hantar form:
-        $('form').on('submit', function(e) {
-            const canvas = document.getElementById('signature-pad');
-            const dataURL = canvas.toDataURL('image/png');
-            $('#signature_data').val(dataURL);
-        });
         $(document).ready(function() {
 
             // Bila drop-down hotel ditukar (change event)
