@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hotel_id  = intval($_POST['hotelname']);
     $typetask  = $_POST['task'];
     $pic_email = $_POST['picemail'] ?? '';
+    $designation = $_POST['designation'] ?? '';
 
     // Nama PIC diambil terus dari input 'newstaff'
     $pic_name  = $_POST['newstaff'] ?? '';
@@ -49,11 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Step 3: Insert rekod ke dalam table jobsheet
     $stmt = $conn->prepare("INSERT INTO jobsheet 
-        (date, time, description,hotel_id, task_type, pic_name, pic_email, signature_path) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        (date, time, description,hotel_id, task_type, pic_name, pic_assist_desg, pic_email, signature_path) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    // 8 parameter diikat dengan tepat ke dalam table jobsheet
-    $stmt->bind_param("sssissss", $date, $time, $description, $hotel_id, $typetask, $pic_name, $pic_email, $signature_filename);
+    // 9 parameter diikat dengan tepat ke dalam table jobsheet
+    $stmt->bind_param("sssisssss", $date, $time, $description, $hotel_id, $typetask, $pic_name, $designation, $pic_email, $signature_filename);
     if ($stmt->execute()) {
         $jobsheet_id = $stmt->insert_id;
         $stmt->close();

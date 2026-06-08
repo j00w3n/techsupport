@@ -213,7 +213,7 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
                                         <span class="mx-1.5 text-slate-300">•</span>
                                         <i class="far fa-clock mr-1"></i> <?= htmlspecialchars($row['time']) ?>
                                         <span class="mx-1.5 text-slate-300">•</span>
-                                        <i class="far fa-user mr-1"></i> PIC: <?= htmlspecialchars($row['person_name'] ?? 'N/A') ?>
+                                        <i class="far fa-user mr-1"></i> PIC: <?= htmlspecialchars($row['pic_name'] ?? 'N/A') ?> (<?= htmlspecialchars($row['pic_assist_desg'] ?? 'N/A') ?>)
                                         <span class="mx-1.5 text-slate-300">•</span>
                                         <i class="far fa-user mr-1"></i> Signature: <?= htmlspecialchars($row['signature_path'] ?? 'N/A') ?>
                                     </p>

@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="viv-logo.png">
 </head>
 
 <body class="bg-slate-100 text-slate-800 font-sans antialiased">
@@ -17,9 +18,9 @@
     <div class="max-w-4xl mx-auto px-4 py-8">
         <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
 
-            <div class="bg-slate-900 px-6 py-4 border-b border-slate-800">
-                <h3 class="text-xl font-bold text-white tracking-wide uppercase flex items-center gap-2">
-                    <i class="fas fa-file-invoice text-sky-500"></i> Tech Support Jobsheet
+            <div class="bg-gray-200 px-6 py-4  border-slate-800">
+                <h3 class="text-xl font-bold text-dark tracking-wide capitalize flex items-center gap-2">
+                     Tech Support Jobsheet
                 </h3>
             </div>
 
@@ -123,6 +124,12 @@
                                 class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150 text-slate-800"
                                 placeholder="Enter PIC name (e.g. Haziq)">
                         </div>
+                        <div>
+                            <label for="designation" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Designation</label>
+                            <input type="text" id="designation" name="designation" required
+                                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition duration-150 text-slate-800"
+                                placeholder="Enter designation (e.g. Manager)">
+                        </div>
 
                         <div>
                             <label for="picemail" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Email Address</label>
@@ -169,17 +176,35 @@
             const dataURL = signaturePad.toDataURL('image/png');
             $('#signature_data').val(dataURL);
         });
+
+        function generalModal(title, message) {
+            const modalHTML = `
+                <div class="fixed inset-0 flex items-center justify-center z-50">
+                    <div class="absolute inset-0 bg-black opacity-50"></div>
+                    <div class="bg-white rounded-lg shadow-lg p-6 z-10 max-w-sm w-full">
+                        <h2 class="text-xl font-bold mb-4">${title}</h2>
+                        <p class="mb-6">${message}</p>
+                        <button id="closeModal" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded transition duration-150">Close</button>
+                    </div>
+                </div>
+            `;
+            $('body').append(modalHTML);
+            $('#closeModal').on('click', function() {
+                $(this).closest('.fixed').remove();
+            });
+        }   
+        
         $(document).ready(function() {
 
             // 1. Define English templates (Maintaining 'maintanance' to match your PHP value)
             const descriptionTemplates = {
-                'troubleshoot': 'Our team conducted a thorough inspection of the system reported to be experiencing downtime/disruption. Upon detailed investigation, the root cause was identified at [PLEASE SPECIFY ROOT CAUSE]. \nCorrective actions were taken by [PLEASE SPECIFY ACTIONS TAKEN]. Final testing confirms that the system is now fully operational and running stably. \n\n All Channel running okay.',
+                'troubleshoot': 'Our VIVTech team conducted a thorough inspection of the system reported to be experiencing downtime/disruption. Upon detailed investigation, the root cause was identified at \n[PLEASE SPECIFY ROOT CAUSE]. \nCorrective actions were taken by [PLEASE SPECIFY ACTIONS TAKEN]. \n\nFinal testing confirms that the system is now fully operational and running stably.',
 
-                'installation': 'The installation of new infrastructure was successfully executed at [PLEASE SPECIFY LOCATION/ROOM]. The components deployed involve [PLEASE SPECIFY EQUIPMENT]. All network configurations have been aligned according to standard specifications and are fully ready for operational use.',
+                'installation': 'The installation of new infrastructure was successfully executed at \n[PLEASE SPECIFY LOCATION/ROOM]. \nThe components deployed involve [PLEASE SPECIFY EQUIPMENT]. \n\nAll network configurations have been aligned according to standard specifications and are fully ready for operational use.',
 
-                'dismantle': 'Dismantling and decommissioning works of the old equipment components were carried out at [PLEASE SPECIFY LOCATION]. The hardware includes [PLEASE SPECIFY EQUIPMENT]. \n\nAll uninstalled components have been cataloged and safely stored/disposed of in accordance with standard procedures.',
+                'dismantle': 'Dismantling and decommissioning works of the old equipment components were carried out at [PLEASE SPECIFY LOCATION]. The hardware includes \n[PLEASE SPECIFY EQUIPMENT]. \n\nAll uninstalled components have been cataloged and safely stored/disposed of in accordance with standard procedures.',
 
-                'maintanance': 'Preventive maintenance was carried out on [VF28HD/VIVNEWS]. The scope of work included physical cleaning, system log reviews, and firmware updates. No critical errors were found, and the overall system performance is at its optimum level.'
+                'maintanance': 'Preventive maintenance was carried out on [VF28HD/VIVNEWS]. The scope of work included physical cleaning, system log reviews, and firmware updates. \n\nNo critical errors were found, and the overall system performance is at its optimum level.'
             };
 
             // Common function to inject text into textarea

@@ -14,12 +14,14 @@ if (isset($_GET['id'])) {
                                    j.hotel_id,
                                    j.task_type,
                                    j.pic_name,
+                                      j.pic_assist_desg,
                                    j.pic_email,
                                    j.description,
                                    j.signature_path, -- 🌟 Paksa ambil column path tanda tangan
                                    DATE_FORMAT(j.date, '%d %M %Y') AS formatted_date, 
                                    TIME_FORMAT(j.time, '%H:%i %p') AS formatted_time, 
-                                   h.name AS hotel_name
+                                   h.name AS hotel_name,
+                                   h.pic_main_desg AS hotel_pic_desg
                             FROM jobsheet j
                             JOIN hotel h ON j.hotel_id = h.id
                             WHERE j.id = ?");
@@ -95,12 +97,12 @@ if (isset($_GET['id'])) {
     $pdf->SetTextColor(0, 71, 171);
     $pdf->Cell(50, 10, 'Person In Charge:', 0, 0);
     $pdf->SetTextColor(0, 0, 0);
-    $pdf->Cell(0, 10, $row['pic_name'], 0, 1);
+    $pdf->Cell(0, 10, $row['pic_name'] . ' ( ' . $row['pic_assist_desg'] . ' )', 0, 1);
 
     $pdf->SetTextColor(0, 71, 171);
     $pdf->Cell(50, 10, 'Email:', 0, 0);
     $pdf->SetTextColor(0, 0, 0);
-    $pdf->Cell(0, 10, $row['pic_email'], 0, 1);
+    $pdf->Cell(0, 10, $row['pic_email'] .' ( '. $row['hotel_pic_desg'] .' )', 0, 1);
 
     $pdf->SetTextColor(0, 71, 171);
     $pdf->Cell(50, 10, 'Task:', 0, 0);
@@ -152,7 +154,7 @@ if (isset($_GET['id'])) {
     $pdf->SetTextColor(0, 0, 0);
     $pdf->Cell(95, 5, '__________________________', 0, 1);
     $pdf->SetX(15);
-    $pdf->Cell(95, 15, 'Name: ' . ($row['pic_name'] ?? 'N/A'), 0, 0);
+    $pdf->Cell(95, 15, 'Name: ' . ($row['pic_name'] ?? 'N/A') . ' (' . ($row['pic_assist_desg'] ?? 'N/A') . ')', 0, 0);
 
 
     // -----------------------------------------------------------------

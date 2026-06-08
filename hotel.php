@@ -20,6 +20,31 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
 
     <?php include 'navbar.php'; ?>
 
+    <!-- general modal message -->
+    <div id="general_msg_modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-200">
+        <div class="bg-white rounded-xl shadow-xl border border-slate-100 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-200" id="modalBox">
+
+            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <h3 class="text-lg font-bold text-slate-800" id="gen_modal_title">Notification</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-200/60 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="px-5 py-6">
+                <p class="text-sm text-slate-600 leading-relaxed" id="gen_modal_message">Message goes here...</p>
+            </div>
+
+            <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button onclick="closeModal('general_msg_modal')" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-150">
+                    Okay
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="addHotelModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl border border-slate-200 max-w-md w-full overflow-hidden transform transition-all">
             <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800">
@@ -42,6 +67,10 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
                 <div class="mt-4">
                     <label for="hotelPerson" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Point of Contact</label>
                     <input type="text" id="hotelPerson" name="hotelPerson" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                </div>
+                <div class="mt-4">
+                    <label for="hotelDesignation" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">PIC Designation</label>
+                    <input type="text" id="hotelDesignation" name="hotelDesignation" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
                 </div>
                 <div>
                     <label for="hotelState" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">State / Region</label>
@@ -85,6 +114,10 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
                 <div class="mt-4">
                     <label for="editHotelPerson" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Point of Contact</label>
                     <input type="text" id="editHotelPerson" name="hotelPerson" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                </div>
+                <div class="mt-4">
+                    <label for="editHotelDesignation" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">PIC Designation</label>
+                    <input type="text" id="editHotelDesignation" name="hotelDesignation" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
                 </div>
                 <div>
                     <label for="edithotelState" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">State / Region</label>
@@ -161,6 +194,7 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
                             <th class="p-3 border border-slate-800">Hotel Name</th>
                             <th class="p-3 border border-slate-800">Hotel Email</th>
                             <th class="p-3 border border-slate-800">Person</th>
+                            <th class="p-3 border border-slate-800">Designation</th>
                             <th class="p-3 border border-slate-800 w-[25%]">State / Region</th>
                             <th class="p-3 border border-slate-800 text-center w-[12%]">Actions</th>
                         </tr>
@@ -173,6 +207,7 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
                                 <td class="p-3 font-semibold uppercase text-slate-900"><?= htmlspecialchars($row['name']) ?></td>
                                 <td class="p-3 font-semibold text-slate-900"><?= htmlspecialchars($row['email']) ?></td>
                                 <td class="p-3 font-medium text-slate-600"><?= htmlspecialchars($row['picname']) ?></td>
+                                <td class="p-3 font-medium text-slate-600"><?= htmlspecialchars($row['pic_main_desg']) ?></td>
                                 <td class="p-3 font-medium text-slate-600"><?= htmlspecialchars($row['state']) ?></td>
                                 <td class="p-3 text-center">
                                     <button type="button" class="edit-hotel-btn p-2 bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-700 rounded-md transition inline-flex items-center justify-center"
@@ -180,6 +215,7 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
                                         data-name="<?= htmlspecialchars($row['name']) ?>"
                                         data-email="<?= htmlspecialchars($row['email']) ?>"
                                         data-picname="<?= htmlspecialchars($row['picname']) ?>"
+                                        data-pic_main_desg="<?= htmlspecialchars($row['pic_main_desg']) ?>"
                                         data-state="<?= htmlspecialchars($row['state']) ?>">
                                         <i class="fa-solid fa-edit text-xs"></i>
                                     </button>
@@ -198,13 +234,18 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
     </div>
 
     <script>
-        // Modal Control Handlers
         function openModal(modalId) {
             document.getElementById(modalId).classList.remove('hidden');
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function showGeneralModal(title, message) {
+            document.getElementById('gen_modal_title').innerText = title;
+            document.getElementById('gen_modal_message').innerText = message;
+            openModal('general_msg_modal');
         }
 
         $(document).ready(function() {
@@ -214,19 +255,25 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
                 const hotelName = $(this).data('name');
                 const hotelState = $(this).data('state'); // Ditukar dari 'quantity' ke 'state'
                 const hotelEmail = $(this).data('email');
+                const hotelPerson = $(this).data('picname');
+                const hotelDesignation = $(this).data('pic_main_desg');
 
                 $('#editHotelId').val(hotelid);
                 $('#editHotelName').val(hotelName);
                 $('#edithotelState').val(hotelState);
                 $('#editHotelEmail').val(hotelEmail);
+                $('#editHotelPerson').val(hotelPerson);
+                $('#editHotelDesignation').val(hotelDesignation);
 
                 openModal('editHotelModal');
+                
             });
             // Trigger Delete Modal
             $('.delete-hotel-btn').on('click', function() {
                 const hotelid = $(this).data('id');
                 $('#deleteHotelId').val(hotelid);
                 openModal('deleteHotelModal');
+                showGeneralModal("Success!", "Hotel deleted successfully!");
             });
         });
 
@@ -238,12 +285,12 @@ $hotelResult = $conn->query("SELECT * FROM hotel");
             const added = url.searchParams.get('added');
 
             if (updated === '1') {
-                alert("Hotel updated successfully!");
+                showGeneralModal("Success!", "Hotel updated successfully!");
                 url.searchParams.delete('updated');
                 window.history.replaceState({}, document.title, url.pathname + url.search);
             }
             if (added === '1') {
-                alert("Hotel added successfully!");
+                showGeneralModal("Success!", "Hotel added successfully!");
                 url.searchParams.delete('added');
                 window.history.replaceState({}, document.title, url.pathname + url.search);
             }

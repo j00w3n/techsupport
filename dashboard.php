@@ -72,7 +72,7 @@ ORDER BY
 <body class="bg-slate-100 text-slate-800 font-sans antialiased overflow-x-hidden">
 
     <?php include 'navbar.php'; ?>
-
+    
     <!-- Modal for Jobsheet Details -->
     <div id="jobsheetDetailsModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl border border-slate-200 max-w-2xl w-full overflow-hidden transform transition-all">

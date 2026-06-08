@@ -55,17 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             
             <div class='info py-1.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center'>
                 <span class='font-bold text-slate-500 w-32 uppercase tracking-wider text-[11px]'>Person In Charge</span>
-                <span class='text-slate-800 font-medium'>" . htmlspecialchars($row['pic_name'] ?? 'N/A') . "</span>
+                <span class='text-slate-800 font-medium uppercase'>" . htmlspecialchars($row['pic_name'] ?? 'N/A') . "</span>
             </div>
             
             <div class='info py-1.5 border-b border-slate-100 flex flex-col'>
                 <span class='font-bold text-slate-500 w-32 uppercase tracking-wider text-[11px] mb-1'>Log Description</span>
-                <div class='bg-slate-50 border border-slate-100 rounded p-2.5 font-mono text-xs text-slate-600 leading-relaxed'>" . nl2br(htmlspecialchars($row['complaint'] ?? 'No issue logs submitted.')) . "</div>
-            </div>
-            
-            <div class='info py-1.5 flex flex-col'>
-                <span class='font-bold text-slate-500 w-32 uppercase tracking-wider text-[11px] mb-1'>Items Deployed</span>
-                <span class='text-slate-800 font-medium'>" . $items_display . "</span>
+                <div class='bg-slate-50 border border-slate-100 rounded p-2.5 font-mono text-xs text-slate-600 leading-relaxed'>" . nl2br(htmlspecialchars($row['description'] ?? 'No issue logs submitted.')) . "</div>
             </div>
         </div>
         ";
