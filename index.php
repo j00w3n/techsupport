@@ -133,7 +133,7 @@
 
                         <div>
                             <label for="picemail" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Email Address</label>
-                            <input type="email" id="picemail" name="picemail" readonly
+                            <input type="email" id="picemail" name="picemail"
                                 class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm text-slate-500 focus:outline-none"
                                 placeholder="hotel@email.com">
                         </div>
@@ -195,8 +195,6 @@
         }   
         
         $(document).ready(function() {
-
-            // 1. Define English templates (Maintaining 'maintanance' to match your PHP value)
             const descriptionTemplates = {
                 'troubleshoot': 'Our VIVTech team conducted a thorough inspection of the system reported to be experiencing downtime/disruption. Upon detailed investigation, the root cause was identified at \n[PLEASE SPECIFY ROOT CAUSE]. \nCorrective actions were taken by [PLEASE SPECIFY ACTIONS TAKEN]. \n\nFinal testing confirms that the system is now fully operational and running stably.',
 
@@ -206,8 +204,6 @@
 
                 'maintanance': 'Preventive maintenance was carried out on [VF28HD/VIVNEWS]. The scope of work included physical cleaning, system log reviews, and firmware updates. \n\nNo critical errors were found, and the overall system performance is at its optimum level.'
             };
-
-            // Common function to inject text into textarea
             function updateDescription(taskValue) {
                 if (descriptionTemplates[taskValue]) {
                     $('#description').val(descriptionTemplates[taskValue]);
@@ -215,14 +211,10 @@
                     $('#description').val('');
                 }
             }
-
-            // 2. AUTO-FILL ON FIRST LOAD: Fetch the default checked radio button (Troubleshoot)
             const initialTask = $('input[name="task"]:checked').val();
             if (initialTask) {
                 updateDescription(initialTask);
             }
-
-            // 3. TRIGGER ON RADIO BUTTON CHANGE
             $('input[name="task"]').on('change', function() {
                 const selectedTask = $(this).val();
                 updateDescription(selectedTask);
@@ -231,7 +223,6 @@
         });
     </script>
     <script>
-        // Add item row dynamic cloning
         document.getElementById('addItem').addEventListener('click', function() {
             const container = document.getElementById('item-container');
             const firstRow = container.querySelector('.item-row');
@@ -239,8 +230,6 @@
             newRow.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
             container.appendChild(newRow);
         });
-
-        // Delete row logic
         document.getElementById('item-container').addEventListener('click', function(e) {
             if (e.target.closest('.remove-item')) {
                 const rows = document.querySelectorAll('.item-row');
@@ -249,10 +238,7 @@
                 }
             }
         });
-        // Contoh jika kau guna SignaturePad library atau Javascript biasa masa hantar form:
         $(document).ready(function() {
-
-            // Bila drop-down hotel ditukar (change event)
             $('#hotelname').on('change', function() {
                 const selectedOption = $(this).find('option:selected');
                 const hotelEmail = selectedOption.data('email');

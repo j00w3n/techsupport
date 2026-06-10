@@ -4,39 +4,76 @@ include 'db.php';
 // 1. Tarik senarai hotel untuk drop-down filter (Kekalkan)
 $hotelsQuery = $conn->query("SELECT * FROM hotel ORDER BY name ASC");
 
-// 2. Ambil data filter dari URL params (Kekalkan)
+// 2. Ambil data filter dari URL params (Kekalkan filter asal + TAMBAH filter julat tarikh)
 $filterHotel = isset($_GET['hotel_id']) ? $_GET['hotel_id'] : '';
 $filterTask  = isset($_GET['task_type']) ? $_GET['task_type'] : '';
-$filterDate  = isset($_GET['date']) ? $_GET['date'] : '';
+// 🌟 TUKAR: Ambil julat tarikh 'from_date' dan 'to_date'
+$from_date   = isset($_GET['from_date']) ? $_GET['from_date'] : '';
+$to_date     = isset($_GET['to_date']) ? $_GET['to_date'] : '';
 
-// 3. 🌟 QUERY BARU: Buang JOIN hotel_person, ambil terus pic_name dari jobsheet
+// 3. QUERY ASAL: Mengambil data asas jobsheet dan hotel
 $sql = "SELECT j.*, h.name AS hotel_name 
         FROM jobsheet j
         JOIN hotel h ON j.hotel_id = h.id
         WHERE 1=1";
 
+// Sediakan array untuk simpan parameter prepared statement
+$params = [];
+$types = "";
+
+// Tambah filter Hotel jika dipilih
 if ($filterHotel != '') {
-    $sql .= " AND j.hotel_id = " . intval($filterHotel);
-}
-if ($filterTask != '') {
-    $sql .= " AND j.task_type = '" . $conn->real_escape_string($filterTask) . "'";
-}
-if ($filterDate != '') {
-    $sql .= " AND j.date = '" . $conn->real_escape_string($filterDate) . "'";
+    $sql .= " AND j.hotel_id = ?";
+    $params[] = intval($filterHotel);
+    $types .= "i";
 }
 
-// Susun ikut tarikh dan masa terbaru
+// Tambah filter Task Type jika dipilih
+if ($filterTask != '') {
+    $sql .= " AND j.task_type = ?";
+    $params[] = $filterTask;
+    $types .= "s";
+}
+
+// 🌟 LOGIK KRONOLOGI BARU: Penapis Julat Tarikh (Timeline dari bila ke bila)
+if ($from_date != '' && $to_date != '') {
+    $sql .= " AND j.date BETWEEN ? AND ?";
+    $params[] = $from_date;
+    $params[] = $to_date;
+    $types .= "ss";
+} elseif ($from_date != '') {
+    $sql .= " AND j.date >= ?";
+    $params[] = $from_date;
+    $types .= "s";
+} elseif ($to_date != '') {
+    $sql .= " AND j.date <= ?";
+    $params[] = $to_date;
+    $types .= "s";
+}
+
+// Susun ikut tarikh dan masa terbaru (Timeline Order)
 $sql .= " ORDER BY j.date DESC, j.time DESC";
-$jobsheetResult = $conn->query($sql);
+
+// 4. PREPARED STATEMENT: Proses query dengan selamat
+$stmt = $conn->prepare($sql);
+
+// Ikat parameter jika ada filter yang aktif
+if (count($params) > 0) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$jobsheetResult = $stmt->get_result();
 
 $jobsheetsArray = [];
 
-// 4. Sedut data masuk ke dalam array untuk diagihkan ke Timeline & List bawah
+// 5. Sedut data masuk ke dalam array untuk diagihkan ke Timeline & List bawah (Kekalkan)
 if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
     while ($row = $jobsheetResult->fetch_assoc()) {
         $jobsheetsArray[] = $row;
     }
 }
+$stmt->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -88,17 +125,22 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
             </a>
         </div>
 
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <form method="GET" action="" class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
+            <form method="GET" action="jobsheet-list.php" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Filter Hotel</label>
                     <select name="hotel_id" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
                         <option value="">All Hotels</option>
-                        <?php while ($h = $hotelsQuery->fetch_assoc()): ?>
+                        <?php
+                        $hotelsQuery->data_seek(0);
+                        while ($h = $hotelsQuery->fetch_assoc()):
+                        ?>
                             <option value="<?= $h['id'] ?>" <?= $filterHotel == $h['id'] ? 'selected' : '' ?>><?= htmlspecialchars($h['name']) ?></option>
                         <?php endwhile; ?>
                     </select>
                 </div>
+
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Task Type</label>
                     <select name="task_type" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
@@ -109,23 +151,31 @@ if ($jobsheetResult && $jobsheetResult->num_rows > 0) {
                         <option value="maintanance" <?= $filterTask == 'maintanance' ? 'selected' : '' ?>>Maintenance</option>
                     </select>
                 </div>
+
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Specific Date</label>
-                    <input type="date" name="date" value="<?= htmlspecialchars($filterDate) ?>" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">From Date</label>
+                    <input type="date" name="from_date" value="<?= htmlspecialchars($from_date) ?>" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
                 </div>
-                <div class="flex gap-2">
-                    <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-lg transition text-center">
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">To Date</label>
+                    <input type="date" name="to_date" value="<?= htmlspecialchars($to_date) ?>" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                </div>
+
+                <div class="flex gap-2 w-full">
+                    <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-lg transition text-center h-[34px] flex items-center justify-center">
                         <i class="fas fa-filter mr-1"></i> Apply
                     </button>
-                    <?php if ($filterHotel || $filterTask || $filterDate): ?>
-                        <a href="jobsheet-list.php" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs uppercase tracking-wider py-2.5 px-3 rounded-lg border border-red-200 transition text-center" title="Clear Filters">
-                            <i class="fas fa-times-circle"></i>
+
+                    <?php if ($filterHotel || $filterTask || $from_date || $to_date): ?>
+                        <a href="jobsheet-list.php" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs uppercase tracking-wider p-2.5 rounded-lg border border-red-200 transition text-center h-[34px] flex items-center justify-center aspect-square" title="Clear Filters">
+                            <i class="fas fa-times-circle text-base"></i>
                         </a>
                     <?php endif; ?>
                 </div>
+
             </form>
         </div>
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <div class="lg:col-span-1">

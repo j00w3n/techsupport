@@ -21,7 +21,8 @@ if (isset($_GET['id'])) {
                                    DATE_FORMAT(j.date, '%d %M %Y') AS formatted_date, 
                                    TIME_FORMAT(j.time, '%H:%i %p') AS formatted_time, 
                                    h.name AS hotel_name,
-                                   h.pic_main_desg AS hotel_pic_desg
+                                   h.pic_main_desg AS hotel_pic_desg,
+                                   h.state AS hotel_state
                             FROM jobsheet j
                             JOIN hotel h ON j.hotel_id = h.id
                             WHERE j.id = ?");
@@ -69,8 +70,14 @@ if (isset($_GET['id'])) {
     $pdf->SetTextColor(0, 0, 0);
     $pdf->SetXY(30, 47);
     $pdf->Cell(0, 10, $row['hotel_name'], 0, 1);
-    $pdf->SetTextColor(220, 38, 38);
 
+    $pdf->SetTextColor(0, 71, 171);
+    $pdf->Cell(0, 10, 'State:', 0, 0);
+    $pdf->SetXY(30, 57);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell(0, 10, $row['hotel_state'], 0, 1);
+
+    $pdf->SetTextColor(220, 38, 38);
     $pdf->SetXY(150, 37);
     $pdf->Cell(0, 10, 'ID:', 0, 0);
     $pdf->SetXY(165, 37);
